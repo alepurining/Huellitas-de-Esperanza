@@ -99,9 +99,10 @@ Sistema base: **refugio2**. Los verdes/terracota de refugio1 se conservan sólo 
 |---|---|
 | `#283e35` | Títulos editoriales sobre fondos claros cuando se requiera un verde tinta (11.09:1 sobre `#fffafa`); frases de marca. |
 | `#b94f35` | Estados *Danger*, CTA de énfasis en secciones editoriales, numeración de pasos. |
-| `#243d33` | Bandas oscuras de contenido (sección "Cómo ayudar"), texto blanco/`#f0f2e8` encima (11.73:1 / 10.37:1). |
+| `#243d33` | Bandas oscuras de contenido (disponible para secciones editoriales de Sprint 2), texto blanco/`#f0f2e8` encima (11.73:1 / 10.37:1). |
 | `#eacb78` | Enlaces y microtexto sobre bandas oscuras (7.44:1). |
 | `#e6ebdf` / `#faf7f0` / `#dcddd2` | Paneles salvia, fondo crema y separadores de la landing editorial. |
+| `#cfe0c4` | **Salvia oscura** (`--color-sage-600`): fondo de la banda **"Cómo ayudar"** de la landing. Un paso más oscura que `#e6ebdf` para separar la banda del `bg-cream` vecino sin volver al verde tinta. |
 
 ### Pares de contraste verificados (WCAG 2.1)
 
@@ -118,6 +119,11 @@ Sistema base: **refugio2**. Los verdes/terracota de refugio1 se conservan sólo 
 | `#264661` sobre `#93c5fd` (botón staff) | 5.46:1 | AA |
 | Blanco sobre `#b94f35` (danger sólido) | 4.96:1 | AA |
 | `#f472b6` sobre blanco | 2.65:1 | ✗ — **sólo ≥24px bold o decorativo** |
+| `#283e35` sobre `#cfe0c4` (título de la banda salvia) | 8.26:1 | AAA |
+| `#374151` sobre `#cfe0c4` | 7.42:1 | AAA |
+| `#4b5563` sobre `#cfe0c4` (cuerpo en la banda salvia) | 5.44:1 | AA |
+| `#276650` sobre `#cfe0c4` (iconos mint de la banda salvia) | 4.87:1 | AA |
+| `#6b7280` sobre `#cfe0c4` | 3.48:1 | ✗ — no usar texto terciario sobre salvia (usar `#4b5563`) |
 
 ---
 
@@ -459,6 +465,7 @@ Bloque listo para `app/globals.css` con Tailwind v4 (`@theme`) o CSS plano:
   --color-forest-deep: #243d33;
   --color-gold: #eacb78;
   --color-sage: #e6ebdf;
+  --color-sage-600: #cfe0c4;
   --color-cream-r1: #faf7f0;
   --color-line-r1: #dcddd2;
 

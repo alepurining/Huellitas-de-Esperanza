@@ -1,0 +1,100 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400&family=Nunito:wght@400;600;700;800&display=swap");
+@import "tailwindcss";
+
+/* Tokens de STYLEGUIDE.md. Tailwind v4 no usa tailwind.config: todo vive acá. */
+@theme {
+  /* Primarios y acentos */
+  --color-primary: #f472b6;
+  --color-primary-600: #be4e89;
+  --color-primary-700: #ad3f79;
+  --color-primary-50: #fce7f3;
+  --color-primary-200: #f9a8d4;
+  --color-secondary: #93c5fd;
+  --color-secondary-ink: #264661;
+  --color-accent: #fdba74;
+  --color-accent-ink: #74471d;
+  --color-mint: #a7f3d0;
+  --color-mint-ink: #276650;
+
+  /* Fondos y superficies */
+  --color-bg: #fffafa;
+  --color-cream: #fdfbf7;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f8f7f4;
+  --color-tint: #fff0f7;
+  --color-blue-50: #eff6ff;
+
+  /* Neutros y texto */
+  --color-ink: #374151;
+  --color-ink-700: #4b5563;
+  --color-ink-500: #6b7280;
+  --color-ink-400: #858d99;
+  --color-ink-300: #9ca3af;
+  --color-border: #eadde4;
+  --color-border-soft: #f1e6e6;
+  --color-border-pink: #fce7f3;
+  --color-on-dark: #e5e7eb;
+
+  /* Semánticos */
+  --color-success-50: #d9f8e9;
+  --color-success-700: #2f6d55;
+  --color-warning-50: #fff2dc;
+  --color-warning-700: #8a5a22;
+  --color-info-50: #eff6ff;
+  --color-info-700: #416589;
+  --color-danger-50: #f2e1d5;
+  --color-danger-700: #a8452e;
+  --color-danger: #b94f35;
+
+  /* Acentos heredados de refugio1 */
+  --color-forest: #283e35;
+  --color-terracota: #b94f35;
+  --color-forest-deep: #243d33;
+  --color-gold: #eacb78;
+  --color-sage: #e6ebdf;
+  --color-sage-600: #cfe0c4;
+  --color-cream-r1: #faf7f0;
+  --color-line-r1: #dcddd2;
+
+  /* Radios */
+  --radius-pill: 100px;
+  --radius-card: 20px;
+  --radius-panel: 21px;
+  --radius-modal: 26px;
+  --radius-input: 12px;
+
+  /* Sombras */
+  --shadow-card: 0 10px 35px rgba(81, 55, 55, 0.06);
+  --shadow-card-hover: 0 18px 40px rgba(81, 55, 55, 0.11);
+  --shadow-soft: 0 7px 25px rgba(73, 53, 60, 0.05);
+  --shadow-menu: 0 18px 45px rgba(87, 57, 71, 0.15);
+  --shadow-modal: 0 30px 80px rgba(60, 48, 56, 0.55);
+  --shadow-toast: 0 10px 25px rgba(0, 0, 0, 0.2);
+
+  /* Tipografía */
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Nunito", system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 2px solid #be4e89;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px #fce7f3;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

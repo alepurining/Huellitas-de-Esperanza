@@ -1,0 +1,88 @@
+// prisma/schema.prisma
+// Modelo de datos del MVP (Sprint 1) — 5 tablas planas, snake_case español.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id              Int        @id @default(autoincrement()) @map("id_usuario")
+  nombre          String     @db.VarChar(80)
+  correo          String     @unique @db.VarChar(80)
+  hash_contrasena String     @db.VarChar(255) @map("hash_contrasena")
+  rol             String     @db.VarChar(20) // administrador | veterinario | voluntario
+  donaciones      Donacion[]
+
+  @@map("usuario")
+}
+
+model Mascota {
+  id             Int      @id @default(autoincrement()) @map("id_mascota")
+  nombre         String   @db.VarChar(50)
+  raza           String   @db.VarChar(50)
+  edad_estimada  String   @db.VarChar(30) @map("edad_estimada") // texto: "2 años", "8 meses"
+  especie        String   @db.VarChar(10)                        // perro | gato
+  sexo           String?  @db.VarChar(10)                        // macho | hembra
+  tamano         String?  @db.VarChar(10)                        // pequeño | mediano | grande
+  estado         String   @default("en_adopcion") @db.VarChar(20) // en_adopcion | adoptado
+  personalidad   String?  @db.Text
+  salud_resumen  String?  @db.Text @map("salud_resumen")          // sin historial clínico (US 1.5 = Won't)
+  foto_url       String?  @db.VarChar(255) @map("foto_url")
+  fecha_registro DateTime @default(now()) @map("fecha_registro")
+  solicitudes    SolicitudAdopcion[]
+
+  @@map("mascota")
+}
+
+model Adoptante {
+  id              Int      @id @default(autoincrement()) @map("id_adoptante")
+  documento       String   @unique @db.VarChar(20) // cédula → base del 409 de US 2.1
+  nombre_completo String   @db.VarChar(80) @map("nombre_completo")
+  telefono        String   @db.VarChar(20)
+  direccion       String   @db.VarChar(100)
+  correo          String?  @db.VarChar(80)
+  estado          String   @default("activo") @db.VarChar(20) // activo | inactivo
+  fecha_registro  DateTime @default(now()) @map("fecha_registro")
+  solicitudes     SolicitudAdopcion[]
+
+  @@map("adoptante")
+}
+
+model SolicitudAdopcion {
+  id                   Int      @id @default(autoincrement()) @map("id_solicitud")
+  mascota_id           Int      @map("mascota_id")
+  adoptante_id         Int      @map("adoptante_id")
+  tipo_vivienda        String   @db.VarChar(20) // apartamento | casa | finca
+  animales_en_hogar    Boolean  @default(false) @map("animales_en_hogar")
+  descripcion_vivienda String   @db.Text @map("descripcion_vivienda")
+  personas_en_hogar    Int?     @map("personas_en_hogar")
+  acepta_terminos      Boolean  @default(false) @map("acepta_terminos")
+  estado               String   @default("en_revision") @db.VarChar(20) // en_revision
+  fecha_solicitud      DateTime @default(now()) @map("fecha_solicitud")
+
+  mascota   Mascota   @relation(fields: [mascota_id], references: [id])
+  adoptante Adoptante @relation(fields: [adoptante_id], references: [id])
+
+  @@map("solicitud_adopcion")
+}
+
+model Donacion {
+  id                 Int      @id @default(autoincrement()) @map("id_donacion")
+  tipo_aporte        String   @db.VarChar(20) @map("tipo_aporte") // monetaria | especie
+  monto              Int?     // pesos COP, sin decimales (demo)
+  descripcion_insumo String?  @db.Text @map("descripcion_insumo")
+  cantidad           Int?
+  nombre_donante     String   @db.VarChar(80) @map("nombre_donante")
+  correo             String?  @db.VarChar(80)
+  fecha_donacion     DateTime @default(now()) @map("fecha_donacion")
+  usuario_id         Int      @map("usuario_id") // quién registró el aporte
+
+  usuario Usuario @relation(fields: [usuario_id], references: [id])
+
+  @@map("donacion")
+}

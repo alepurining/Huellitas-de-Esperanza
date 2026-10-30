@@ -164,7 +164,7 @@ avanzados, correos y PDF.
      `Chip` de filtros (Todos / Perros / Gatos) y **4 `PetCard` variante A** con mascotas `en_adopcion`.
      CTA de sección → `/mascotas`.
   6. **Proceso de adopción** (id `#proceso`): introducción + pasos numerados (numeración terracota `#b94f35`).
-  7. **Cómo ayudar** (id `#ayudar`, banda oscura `#243d33`): mensaje + descripción + **3 formas de ayudar**
+  7. **Cómo ayudar** (id `#ayudar`, banda salvia oscura `#cfe0c4`): mensaje + descripción + **3 formas de ayudar**
      (donar, hogar temporal, difusión) en tarjetas informativas. **Sin formulario ni pasarela**:
      los botones son informativos y remiten a la sección de ubicación/contacto (el formulario público de
      donación es Sprint 2).
