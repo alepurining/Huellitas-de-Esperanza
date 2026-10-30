@@ -1,0 +1,38 @@
+
+opencode.json
+
+# Variables de entorno y secretos
+.env
+.env*.local
+.env.production
+.env.development.local
+
+# Dependencias instaladas
+/node_modules
+/.pnpm-store
+
+# Archivos de compilación y caché de Next.js
+/.next/
+/out/
+/build
+/dist
+
+# Bases de datos SQLite locales y temporales de Prisma
+/prisma/*.db
+/prisma/*.sqlite
+/prisma/*.sqlite-journal
+*.db-journal
+
+# Archivos de registro (logs)
+*.log
+
+# Caché de ESLint
+/.eslintcache
+
+# Archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Configuración personal del editor
+.vscode/*
+!.vscode/settings.json
