@@ -2,27 +2,35 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import DashPanel from "@/components/DashPanel";
 import PanelHeading from "@/components/PanelHeading";
+import PrimaryButton from "@/components/PrimaryButton";
 import StatusBadge from "@/components/StatusBadge";
 import Chip from "@/components/Chip";
 import EmptyState from "@/components/EmptyState";
+import Toast from "@/components/Toast";
 import { SearchX } from "lucide-react";
+import { mensajes } from "@/lib/mensajes";
 
 export const metadata = { title: "Mascotas registradas" };
 
 export default async function AdminMascotasPage({ searchParams }) {
-  const { q, estado } = await searchParams;
+  const { q, estado, nueva } = await searchParams;
   const busqueda = typeof q === "string" ? q.trim() : "";
   const filtroEstado = estado === "en_adopcion" || estado === "adoptado" ? estado : null;
+  const idNueva = typeof nueva === "string" ? Number(nueva) : 0;
 
-  const mascotas = await prisma.mascota.findMany({
-    where: {
-      ...(busqueda ? { nombre: { contains: busqueda, mode: "insensitive" } } : {}),
-      ...(filtroEstado ? { estado: filtroEstado } : {}),
-    },
-    orderBy: { fecha_registro: "desc" },
-  });
-
-  const total = await prisma.mascota.count();
+  const [mascotas, total, mascotaNueva] = await Promise.all([
+    prisma.mascota.findMany({
+      where: {
+        ...(busqueda ? { nombre: { contains: busqueda, mode: "insensitive" } } : {}),
+        ...(filtroEstado ? { estado: filtroEstado } : {}),
+      },
+      orderBy: { fecha_registro: "desc" },
+    }),
+    prisma.mascota.count(),
+    Number.isSafeInteger(idNueva) && idNueva > 0
+      ? prisma.mascota.findUnique({ where: { id: idNueva } })
+      : Promise.resolve(null),
+  ]);
 
   return (
     <>
@@ -39,7 +47,9 @@ export default async function AdminMascotasPage({ searchParams }) {
         <PanelHeading
           titulo="Listado de fichas"
           subtitulo={`${mascotas.length} ${mascotas.length === 1 ? "resultado" : "resultados"} con los filtros actuales`}
-        />
+        >
+          <PrimaryButton href="/admin/mascotas/nueva">Nueva ficha</PrimaryButton>
+        </PanelHeading>
 
         <form action="/admin/mascotas" method="get" className="flex flex-col gap-2 sm:flex-row">
           <input
@@ -150,6 +160,8 @@ export default async function AdminMascotasPage({ searchParams }) {
           </div>
         )}
       </DashPanel>
+
+      {mascotaNueva ? <Toast mensaje={mensajes.fichaGuardada} /> : null}
     </>
   );
 }
