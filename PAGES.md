@@ -123,7 +123,7 @@ dialoga. Si algo de diseño no está en `STYLEGUIDE.md`, se propone allí primer
 | 1 | `/` | Landing pública (Inicio · Cómo ayudar · Nosotros · Ubicación) | Soporte | **refugio1** (estructura) |
 | 2 | `/mascotas` | Catálogo público de mascotas (US 1.2) | **MVP** | **refugio1** (sección Adopta) |
 | 3 | `/mascotas/[id]` | Ficha pública de la mascota (US 1.2 · ESC-1.2.2) | **MVP** | **integración** refugio1 (ficha editorial) + refugio2 (comportamiento) |
-| 4 | *(modal)* | `AdoptionModal` — Solicitud pública de adopción (US 4.1) | **MVP** | **refugio2** (modal + formularios) |
+| 4 | `/solicitud-adopcion` | Formulario público independiente de solicitud de adopción (US 4.1) | **MVP** | **refugio2** (formularios) |
 | 5 | `/login` | Acceso al panel privado (3 roles) | Soporte | **refugio2** |
 | 6 | `/admin/mascotas` | Listado de fichas de animales (US 1.2 · ESC-1.2.1) | **MVP** | **refugio2** (tabla) |
 | 7 | `/admin/mascotas/nueva` | Registro de ficha de animal (US 1.1) | **MVP** | **refugio2** (formularios) |
@@ -132,6 +132,7 @@ dialoga. Si algo de diseño no está en `STYLEGUIDE.md`, se propone allí primer
 | 10 | `/admin/adoptantes/nuevo` | Registro de adoptante (US 2.1) | **MVP** | **refugio2** (formularios) |
 | 11 | `/admin/donaciones` | Registro y consulta de donaciones (US 3.3) | **MVP** | **refugio2** (tabla + formulario) |
 | 12 | *(transversal)* | `Toast`, `Spinner`, `EmptyState`, `ErrorBanner` | Soporte | **refugio2** |
+| 13 | *(modal opcional)* | `AdoptionModal` — acceso rápido al mismo formulario desde la ficha | **MVP** | **refugio2** |
 
 **Sprint 2 (no implementar ahora):** `/donar`, `/admin/dashboard`, `/admin/solicitudes`,
 edición/borrado de fichas, `DonationModal`, `ConfirmDangerModal`, `AdoptanteDetailModal`, filtros
@@ -145,8 +146,7 @@ avanzados, correos y PDF.
 
 - **Propósito:** Puerta de entrada del refugio: presentar la marca, mostrar mascotas en adopción,
   explicar el proceso, invitar a ayudar, contar quiénes somos y dar la ubicación. Enlaza al catálogo
-  y al login. **No** contiene formularios funcionales (los formularios públicos del MVP son el
-  `AdoptionModal` del catálogo y la gestión interna).
+  y al login. El formulario público de adopción vive en `/solicitud-adopcion`, no en esta landing.
 - **Origen de Diseño:** **refugio1** (estructura y secciones del frame "Patio de Huellas"), aplicando
   la paleta/tipografía de `STYLEGUIDE.md` (Fraunces + Nunito, paleta refugio2).
 - **Secciones y Bloques (de arriba a abajo):**
@@ -193,16 +193,18 @@ avanzados, correos y PDF.
      `#283e35`), "Perros", "Gatos" con `aria-pressed`; scroll horizontal en móvil. *(Filtro por especie
      como apoyo de lectura; el filtrado avanzado es US 1.4 = Sprint 2.)*
   3. Nota del catálogo (contador de resultados, p. ej. "8 amigos buscando hogar").
-  4. **Grid de `PetCard`**: variante **A** en desktop (4 columnas, `gap: 24px`) y variante **B** en
+  4. CTA "Llenar solicitud de adopción" → `/solicitud-adopcion`.
+  5. **Grid de `PetCard`**: variante **A** en desktop (4 columnas, `gap: 24px`) y variante **B** en
      tablet/móvil (1 columna).
-  5. Estados: `Spinner` ("Cargando…"), `EmptyState` (`SearchX` + "No encontramos mascotas con ese filtro"),
+  6. Estados: `Spinner` ("Cargando…"), `EmptyState` (`SearchX` + "No encontramos mascotas con ese filtro"),
      `ErrorBanner` (`CircleAlert` + "Reintentar").
-  6. `Pagination` (páginas circulares) cuando hay más de 12 resultados.
-  7. `Footer`.
+  7. `Pagination` (páginas circulares) cuando hay más de 12 resultados.
+  8. `Footer`.
 - **`PetCard` variante A** (fichas de 302px): imagen 260px + `PetStatusBadge` "Busco hogar" flotante;
   cuerpo con nombre (Fraunces 30px) + icono de especie (`dog`/`cat`), meta (raza · edad · sexo),
   tamaño, personalidad, línea de salud, separador y CTA de texto "Conocer a {nombre}" + `arrow-up-right`.
 - **Componentes e Interacciones:** `Chip` filtran por `especie` y actualizan la query URL;
+  CTA de solicitud → `/solicitud-adopcion`;
   `PetCard` → `/mascotas/[id]`; `Pagination` pagina el `GET`; `ErrorBanner.Reintentar` → re-fetch.
 - **Datos y Backend:** `GET /api/mascotas?estado=en_adopcion&especie={perro|gato}&pagina=` — solo
   mascotas **en adopción** (nunca `adoptado`). Cada tarjeta muestra `nombre`, `raza`, `edad_estimada`,
@@ -223,36 +225,42 @@ avanzados, correos y PDF.
      badge de estado (`en_adopcion` → "Busco hogar"), personalidad.
   5. **Bloque "Salud"**: resumen (`salud_resumen`: vacunas/desparasitación) — sin historial clínico.
   6. **Cita/descripción corta** + bloque de disponibilidad.
-  7. CTA principal: `PrimaryButton` "Quiero conocer a {nombre}" → abre `AdoptionModal`.
+  7. CTA principal: `PrimaryButton` "Quiero conocer a {nombre}" → abre `AdoptionModal`;
+     enlace secundario a `/solicitud-adopcion?mascota={id}` abre el formulario independiente con la mascota preseleccionada.
   8. Mini-recordatorio del **proceso de adopción** (pasos 1–4) + `Footer`.
 - **Componentes e Interacciones:** `PrimaryButton` → `AdoptionModal` solo si `estado = en_adopcion`;
+  enlace secundario → formulario independiente solo si la mascota está en adopción;
   si `estado = adoptado`, `SecondaryButton` deshabilitado con "Esta mascota ya fue adoptada ❤️".
   `GhostButton` → `/mascotas`.
 - **Datos y Backend:** `GET /api/mascotas/:id` (ficha completa, sin historial clínico). Mascota
   inexistente → `ErrorBanner` + link al catálogo.
 
-### 4. `AdoptionModal` — Solicitud pública de adopción (modal)
+### 4. `/solicitud-adopcion` — Solicitud pública de adopción
 
 - **Propósito:** Recibir la solicitud en línea de un adoptante **sin login**, con sus datos de contacto
-  y condiciones de vivienda. Cumple **US 4.1** (ESC-4.1.1 validación; ESC-4.1.2 registro).
-- **Origen de Diseño:** **refugio2** (patrón Modal + formularios en 2 columnas), coherente con `STYLEGUIDE.md`.
-- **Secciones y Bloques:** (panel modal 650px, radius 26px, backdrop `rgba(50,41,47,.55)` + blur 8px)
-  1. Header: icono 54px (`heart-handshake`, fondo `#fce7f3`) + kicker `POSTULAR A ADOPCIÓN` +
-     H2 Fraunces 29px ("Solicitud para adoptar a {mascota}").
-  2. Botón de cierre circular 38px (`aria-label="Cerrar"`), cierre con `Escape` y click en backdrop,
-     foco atrapado.
-  3. Form en **2 columnas** (1 en móvil):
+- **Origen de Diseño:** formularios en 2 columnas de **refugio2**, dentro de `DashPanel`, coherentes con
+  `STYLEGUIDE.md`.
+- **Secciones y Bloques:**
+  1. Encabezado independiente y `DashPanel` con selector de mascota disponible; al venir desde una
+     ficha, la mascota queda preseleccionada. El formulario puede completarse sin abrir un modal.
+  2. El acceso rápido opcional `AdoptionModal` conserva su panel modal 650px, radius 26px y header:
+     icono 54px (`heart-handshake`, fondo `#fce7f3`) +
+     kicker `POSTULAR A ADOPCIÓN` + H2 Fraunces 29px ("Solicitud para adoptar a {mascota}").
+  3. En el modal: botón de cierre circular 38px (`aria-label="Cerrar"`), cierre con `Escape` y click
+     en backdrop, foco atrapado.
+  4. Form en **2 columnas** (1 en móvil), compartido por la página independiente y el modal:
+     - `mascota_id*` (selector de animales que siguen en adopción; se preselecciona desde la ficha).
      - `documento*` — **cédula** (texto, solo números; hint "cédula del adoptante").
      - `nombre_completo*`, `correo*`, `telefono*`, `direccion*`.
-     - `tipo_vivienda*` (Select: apartamento/casa/finca), `animales_en_hogar` (Segmented: Sí/No),
+     - `tipo_vivienda*` (Select: apartamento/casa/finca), `animales_en_hogar` (checkbox),
        `descripcion_vivienda*` (textarea: condiciones de vivienda), `personas_en_hogar` (opcional).
-     - `ConsentCheckbox` de tratamiento de datos*.
-  4. Pie: `PrimaryButton` "Enviar solicitud" + `OutlineButton` "Cancelar".
-- **Interacciones:** al enviar → validación lado cliente (borde `#b94f35` + anillo `#f2e1d5` + mensaje
-  bajo el campo; foco al primer inválido = ESC-4.1.1). Éxito → `Toast` "¡Solicitud enviada! Te
-  contactaremos pronto." (`CircleCheck`) + cierre del modal (ESC-4.1.2). Error de red → `ErrorBanner`
-  dentro del modal.
-- **Datos y Backend:** `POST /api/solicitudes-adopcion` con
+     - Aceptación de términos*.
+  5. Pie: `PrimaryButton` "Enviar solicitud" + `OutlineButton` "Cancelar".
+- **Interacciones:** al enviar → validación en servidor con errores por campo (borde `#b94f35` +
+  anillo `#f2e1d5` + mensaje bajo el campo; foco al primer inválido = ESC-4.1.1). Éxito → registro
+  y `Toast` "¡Solicitud enviada! Te contactaremos pronto." (`CircleCheck`) en la página de origen
+  (ESC-4.1.2). Mascota ya no disponible → alerta para seleccionar otra.
+- **Datos y Backend:** Server Action `crearSolicitudAdopcion` con
   `{ mascota_id, documento, nombre_completo, correo, telefono, direccion, tipo_vivienda, animales_en_hogar, descripcion_vivienda, personas_en_hogar }`.
   - Busca al adoptante por **`documento` (cédula)**: si existe, **asocia** la solicitud a ese adoptante;
     si no existe, **crea** el adoptante con los datos del formulario y `estado = "activo"`.
@@ -358,10 +366,10 @@ avanzados, correos y PDF.
     `direccion*`, `correo` (opcional).
   - `PrimaryButton` "Registrar Adoptante" + `OutlineButton` "Cancelar" → `/admin/adoptantes`.
 - **Interacciones:** validación de obligatorios (estilo rojo + foco); **ESC-2.1.2**: si la cédula ya
-  existe, el backend responde 409 y la UI muestra `ErrorBanner` (o mensaje bajo `documento`) con el
-  texto exacto *"El número de documento ya se encuentra registrado"*; ESC-2.1.1 → `Toast`
-  "Adoptante registrado" y redirect a `/admin/adoptantes`.
-- **Datos y Backend:** `POST /api/adoptantes` con
+  existe, la acción muestra bajo `documento` el texto exacto *"El número de documento ya se
+  encuentra registrado"*; ESC-2.1.1 → `Toast` "Adoptante registrado" y redirect a
+  `/admin/adoptantes`, mostrando el perfil creado con ID única y estado "Activo".
+- **Datos y Backend:** Server Action `crearAdoptante` con
   `{ documento, nombre_completo, telefono, direccion, correo }` → crea el registro con
   `estado = "activo"`; el backend valida **unicidad de `documento`** (índice único en Prisma).
 

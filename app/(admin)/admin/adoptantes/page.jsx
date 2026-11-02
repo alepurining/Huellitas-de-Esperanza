@@ -1,34 +1,74 @@
-import { SearchX } from "lucide-react";
+import { SearchX, UserPlus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import DashPanel from "@/components/DashPanel";
 import PanelHeading from "@/components/PanelHeading";
 import StatusBadge from "@/components/StatusBadge";
 import EmptyState from "@/components/EmptyState";
 import Chip from "@/components/Chip";
+import PrimaryButton from "@/components/PrimaryButton";
+import Toast from "@/components/Toast";
+import { mensajes } from "@/lib/mensajes";
 
 export const metadata = { title: "Adoptantes" };
 
 export default async function AdminAdoptantesPage({ searchParams }) {
-  const { q } = await searchParams;
+  const { q, nuevo } = await searchParams;
   const busqueda = typeof q === "string" ? q.trim() : "";
+  const idNuevo = typeof nuevo === "string" ? Number(nuevo) : 0;
 
-  const adoptantes = await prisma.adoptante.findMany({
-    where: busqueda ? { documento: { contains: busqueda } } : {},
-    orderBy: { fecha_registro: "desc" },
-  });
-
-  const total = await prisma.adoptante.count();
+  const [adoptantes, total, adoptanteNuevo] = await Promise.all([
+    prisma.adoptante.findMany({
+      where: busqueda ? { documento: { contains: busqueda } } : {},
+      orderBy: { fecha_registro: "desc" },
+    }),
+    prisma.adoptante.count(),
+    Number.isSafeInteger(idNuevo) && idNuevo > 0
+      ? prisma.adoptante.findUnique({ where: { id: idNuevo } })
+      : Promise.resolve(null),
+  ]);
 
   return (
     <>
-      <header className="mb-6">
-        <h1 className="text-[28px] font-extrabold leading-[1.2] text-ink md:text-[34px]">
-          Adoptantes
-        </h1>
-        <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
-          {total} {total === 1 ? "persona registrada" : "personas registradas"} · US 2.2
-        </p>
+      <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-[28px] font-extrabold leading-[1.2] text-ink md:text-[34px]">
+            Adoptantes
+          </h1>
+          <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
+            {total} {total === 1 ? "persona registrada" : "personas registradas"} · US 2.1 y 2.2
+          </p>
+        </div>
+        <PrimaryButton href="/admin/adoptantes/nuevo" icono={UserPlus} tamano="sm">
+          Nuevo adoptante
+        </PrimaryButton>
       </header>
+
+      {adoptanteNuevo ? (
+        <section
+          aria-labelledby="titulo-adoptante-registrado"
+          className="mb-6 rounded-card border border-[#dce8e1] bg-[#f0fdf4] p-5"
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 id="titulo-adoptante-registrado" className="font-display text-xl text-ink">
+                Adoptante registrado
+              </h2>
+              <p className="mt-1 text-sm text-ink-500">Perfil #{adoptanteNuevo.id}</p>
+            </div>
+            <StatusBadge estado={adoptanteNuevo.estado} />
+          </div>
+          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="font-bold text-ink">Nombre</dt>
+              <dd className="mt-0.5 text-ink-500">{adoptanteNuevo.nombre_completo}</dd>
+            </div>
+            <div>
+              <dt className="font-bold text-ink">Cédula</dt>
+              <dd className="mt-0.5 text-ink-500">{adoptanteNuevo.documento}</dd>
+            </div>
+          </dl>
+        </section>
+      ) : null}
 
       <DashPanel>
         <PanelHeading
@@ -106,6 +146,7 @@ export default async function AdminAdoptantesPage({ searchParams }) {
           </div>
         )}
       </DashPanel>
+      {adoptanteNuevo ? <Toast mensaje={mensajes.adoptanteRegistrado} /> : null}
     </>
   );
 }
