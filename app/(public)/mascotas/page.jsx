@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import PetCard from "@/components/PetCard";
 import Chip from "@/components/Chip";
 import EmptyState from "@/components/EmptyState";
+import PrimaryButton from "@/components/PrimaryButton";
+import { HeartHandshake } from "lucide-react";
 
 export const metadata = { title: "Mascotas en adopción" };
 
@@ -27,6 +29,11 @@ export default async function MascotasPage({ searchParams }) {
         Todos están vacunados y desparasitados. Entra a la ficha para conocer su carácter, su salud y
         postularte para adoptarlo.
       </p>
+      <div className="mt-5">
+        <PrimaryButton href="/solicitud-adopcion" icono={HeartHandshake} tamano="sm">
+          Llenar solicitud de adopción
+        </PrimaryButton>
+      </div>
 
       <div
         role="group"

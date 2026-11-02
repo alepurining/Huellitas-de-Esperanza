@@ -76,7 +76,14 @@ export default async function FichaPage({ params, searchParams }) {
 
           <div className="mt-6">
             {disponible ? (
-              <AdoptionModal mascota={{ id: mascota.id, nombre: mascota.nombre }} />
+              <>
+                <AdoptionModal mascota={{ id: mascota.id, nombre: mascota.nombre }} />
+                <p className="mt-3">
+                  <GhostButton href={`/solicitud-adopcion?mascota=${mascota.id}`}>
+                    Abrir formulario en una página independiente
+                  </GhostButton>
+                </p>
+              </>
             ) : (
               <SecondaryButton disabled>Esta mascota ya fue adoptada ❤️</SecondaryButton>
             )}
