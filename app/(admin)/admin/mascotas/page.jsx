@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import DashPanel from "@/components/DashPanel";
 import PanelHeading from "@/components/PanelHeading";
@@ -103,7 +104,10 @@ export default async function AdminMascotasPage({ searchParams }) {
               </thead>
               <tbody>
                 {mascotas.map((mascota) => (
-                  <tr key={mascota.id} className="border-t border-[#f1edef]">
+                  <tr
+                    key={mascota.id}
+                    className="relative border-t border-[#f1edef] transition-colors duration-200 hover:bg-cream"
+                  >
                     <td className="py-3">
                       <div className="flex items-center gap-3">
                         {mascota.foto_url ? (
@@ -119,7 +123,15 @@ export default async function AdminMascotasPage({ searchParams }) {
                         )}
                         <div>
                           <p className="text-[14px] font-extrabold leading-[1.4] text-ink">
-                            {mascota.nombre}
+                            {/* Enlace estirado: toda la fila queda clickeable con un solo <a>. */}
+                            <Link
+                              href={`/admin/mascotas/${mascota.id}`}
+                              className="absolute inset-0 rounded-[8px] after:absolute after:inset-0 after:z-10"
+                              aria-label={`Ver la ficha de ${mascota.nombre}`}
+                            >
+                              <span className="absolute opacity-0">{mascota.nombre}</span>
+                            </Link>
+                            <span className="relative z-0">{mascota.nombre}</span>
                           </p>
                           <p className="text-[12px] leading-[1.4] text-ink-500">
                             {mascota.raza} · {mascota.edad_estimada}
