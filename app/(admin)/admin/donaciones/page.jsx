@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import DashPanel from "@/components/DashPanel";
 import PanelHeading from "@/components/PanelHeading";
+import DonacionForm from "@/components/DonacionForm";
 import StatusBadge from "@/components/StatusBadge";
+import Toast from "@/components/Toast";
 import EmptyState from "@/components/EmptyState";
 import { HandHeart } from "lucide-react";
+import { mensajes } from "@/lib/mensajes";
 
 export const metadata = { title: "Donaciones" };
 
@@ -15,8 +18,16 @@ const moneda = new Intl.NumberFormat("es-CO", {
 
 const fecha = new Intl.DateTimeFormat("es-CO", { dateStyle: "short" });
 
-export default async function AdminDonacionesPage() {
-  const donaciones = await prisma.donacion.findMany({ orderBy: { fecha_donacion: "desc" } });
+export default async function AdminDonacionesPage({ searchParams }) {
+  const { nuevo } = await searchParams;
+  const idNuevo = typeof nuevo === "string" ? Number(nuevo) : 0;
+
+  const [donaciones, donacionNueva] = await Promise.all([
+    prisma.donacion.findMany({ orderBy: { fecha_donacion: "desc" } }),
+    Number.isSafeInteger(idNuevo) && idNuevo > 0
+      ? prisma.donacion.findUnique({ where: { id: idNuevo } })
+      : Promise.resolve(null),
+  ]);
 
   const totalMonetario = donaciones
     .filter((donacion) => donacion.tipo_aporte === "monetaria")
@@ -33,6 +44,19 @@ export default async function AdminDonacionesPage() {
           US 3.3
         </p>
       </header>
+
+      <DashPanel className="mb-6">
+        <PanelHeading
+          titulo="Registrar aporte"
+          subtitulo="Elige si es dinero o un insumo y diligencia los campos. Solo personal del refugio."
+        >
+          <HandHeart size={20} strokeWidth={2} aria-hidden="true" className="text-primary-600" />
+        </PanelHeading>
+        <DonacionForm />
+        <p className="mt-4 rounded-[12px] bg-info-50 p-3 text-[12px] font-semibold leading-[1.5] text-info-700">
+          Demo académica: sin pasarela de pago. Los aportes quedan como registro interno.
+        </p>
+      </DashPanel>
 
       <DashPanel>
         <PanelHeading
@@ -90,6 +114,8 @@ export default async function AdminDonacionesPage() {
           </div>
         )}
       </DashPanel>
+
+      {donacionNueva ? <Toast mensaje={mensajes.aporteRegistrado} /> : null}
     </>
   );
 }
