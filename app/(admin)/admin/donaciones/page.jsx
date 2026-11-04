@@ -40,8 +40,7 @@ export default async function AdminDonacionesPage({ searchParams }) {
           Donaciones
         </h1>
         <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
-          {donaciones.length} {donaciones.length === 1 ? "aporte registrado" : "aportes registrados"} ·
-          US 3.3
+          {donaciones.length} {donaciones.length === 1 ? "aporte registrado" : "aportes registrados"}
         </p>
       </header>
 
@@ -53,9 +52,6 @@ export default async function AdminDonacionesPage({ searchParams }) {
           <HandHeart size={20} strokeWidth={2} aria-hidden="true" className="text-primary-600" />
         </PanelHeading>
         <DonacionForm />
-        <p className="mt-4 rounded-[12px] bg-info-50 p-3 text-[12px] font-semibold leading-[1.5] text-info-700">
-          Demo académica: sin pasarela de pago. Los aportes quedan como registro interno.
-        </p>
       </DashPanel>
 
       <DashPanel>

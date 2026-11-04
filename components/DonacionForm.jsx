@@ -27,6 +27,15 @@ const montosRapidos = [
   { etiqueta: "100.000", valor: "100000" },
 ];
 
+// Etiquetas visibles para listar los campos faltantes (ESC-3.3.1).
+const etiquetasCampos = {
+  tipo_aporte: "Tipo de aporte",
+  monto: "Monto",
+  descripcion_insumo: "Descripción del insumo",
+  cantidad: "Cantidad",
+  nombre_donante: "Nombre del donante",
+};
+
 export default function DonacionForm() {
   const [estado, accion, enviando] = useActionState(registrarDonacion, null);
   const [tipo, setTipo] = useState("monetaria");
@@ -50,13 +59,22 @@ export default function DonacionForm() {
   return (
     <form ref={formularioRef} action={accion} noValidate>
       {estado?.camposFaltantes?.length ? (
-        <p
+        <div
           role="alert"
-          className="flex items-start gap-2 rounded-[12px] bg-danger-50 p-4 text-[13px] font-bold leading-[1.5] text-danger-700"
+          className="rounded-[12px] bg-danger-50 p-4 text-[13px] leading-[1.5] text-danger-700"
         >
-          <CircleAlert size={18} strokeWidth={2} aria-hidden="true" className="mt-0.5 shrink-0" />
-          {estado.mensaje ?? "Revisa los campos marcados antes de continuar."}
-        </p>
+          <div className="flex items-start gap-2">
+            <CircleAlert size={18} strokeWidth={2} aria-hidden="true" className="mt-0.5 shrink-0" />
+            <p className="font-bold">
+              {estado.mensaje ?? "Revisa los campos antes de continuar:"}
+            </p>
+          </div>
+          <ul className="mt-1 list-disc pl-7 font-semibold">
+            {estado.camposFaltantes.map((campo) => (
+              <li key={campo}>{etiquetasCampos[campo] ?? campo}</li>
+            ))}
+          </ul>
+        </div>
       ) : null}
 
       <input type="hidden" name="tipo_aporte" value={tipo} />

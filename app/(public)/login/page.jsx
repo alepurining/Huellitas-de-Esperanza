@@ -41,11 +41,6 @@ export default async function LoginPage() {
             Volver al sitio
           </SecondaryButton>
         </div>
-
-        <p className="mt-5 rounded-[12px] bg-tint p-3 text-[11px] leading-[1.5] text-ink-500">
-          Modo demo: usa un usuario del seed. Por ejemplo admin@huellitas.co con la contraseña
-          Huellitas2026.
-        </p>
       </div>
     </div>
   );

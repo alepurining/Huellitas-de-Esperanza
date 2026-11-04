@@ -94,9 +94,6 @@ export default async function FichaStaffPage({ params }) {
             <p className="mt-3 text-[14px] leading-[1.7] text-ink-700">
               {mascota.salud_resumen || "Sin registrar."}
             </p>
-            <p className="mt-2 text-[11px] leading-[1.4] text-ink-400">
-              El historial clínico no hace parte de este sprint; aquí solo se muestra el resumen.
-            </p>
           </DashPanel>
 
           <DashPanel>

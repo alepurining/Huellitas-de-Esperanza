@@ -40,8 +40,7 @@ export default function Footer() {
         </nav>
 
         <p className="max-w-[260px] text-[11px] leading-[1.4] text-on-dark/70">
-          Proyecto de clase. Cifras, fotos y contactos son de muestra: no hay adopciones ni cobros
-          reales.
+          Huellitas de Esperanza · Refugio de animales en Medellín.
         </p>
       </div>
     </footer>

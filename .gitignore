@@ -1,5 +1,6 @@
 
 opencode.json
+.agents/
 
 # Variables de entorno y secretos
 .env

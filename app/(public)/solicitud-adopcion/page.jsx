@@ -23,6 +23,33 @@ export default async function SolicitudAdopcionPage({ searchParams }) {
       ? mascotas.find((mascota) => mascota.id === idSolicitado) ?? null
       : null;
 
+  if (ok === "solicitud") {
+    return (
+      <div className="mx-auto max-w-[820px] px-4 py-8 md:py-12">
+        <GhostButton href="/mascotas">← Volver a mascotas</GhostButton>
+
+        <Toast mensaje={mensajes.solicitudEnviada} />
+
+        <section className="mt-6 rounded-panel bg-surface p-6 shadow-soft">
+          <h2 className="font-display text-2xl leading-[1.2] text-ink">
+            ¡Solicitud recibida!
+          </h2>
+          <p className="mt-2 max-w-[620px] text-sm leading-[1.7] text-ink-500">
+            Gracias por escribirnos. El equipo del refugio revisará tu solicitud y se pondrá en
+            contacto contigo para coordinar la visita.
+          </p>
+          <p className="mt-4 text-sm leading-[1.7] text-ink-500">
+            ¿Te interesa conocer a otra mascota?{" "}
+            <a href="/mascotas" className="font-bold text-primary-600 underline-offset-2 hover:underline">
+              Vuelve al catálogo
+            </a>
+            .
+          </p>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-[820px] px-4 py-8 md:py-12">
       <GhostButton href="/mascotas">← Volver a mascotas</GhostButton>

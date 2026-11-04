@@ -35,7 +35,7 @@ export default async function AdminAdoptantesPage({ searchParams }) {
             Adoptantes
           </h1>
           <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
-            {total} {total === 1 ? "persona registrada" : "personas registradas"} · US 2.1 y 2.2
+            {total} {total === 1 ? "persona registrada" : "personas registradas"}
           </p>
         </div>
         <PrimaryButton href="/admin/adoptantes/nuevo" icono={UserPlus} tamano="sm">
@@ -82,8 +82,8 @@ export default async function AdminAdoptantesPage({ searchParams }) {
             name="q"
             inputMode="numeric"
             defaultValue={busqueda}
-            placeholder="Número de documento"
-            aria-label="Buscar por número de documento"
+            placeholder="Número de cédula"
+            aria-label="Buscar por número de cédula…"
             className="h-11 w-full rounded-input border border-border bg-surface px-3 font-sans text-[15px] text-ink outline-none transition duration-200 placeholder:text-ink-300 focus:border-primary focus:shadow-[0_0_0_3px_#fce7f3]"
           />
           <button

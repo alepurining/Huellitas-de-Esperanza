@@ -16,7 +16,7 @@ export default function NuevaMascotaPage() {
             Nueva ficha
           </h1>
           <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
-            Registra los datos del animal en su ficha digital · US 1.1
+            Registra los datos del animal en su ficha digital
           </p>
         </div>
       </header>

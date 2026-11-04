@@ -16,7 +16,7 @@ export default function NuevoAdoptantePage() {
             Nuevo adoptante
           </h1>
           <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
-            Registra los datos de contacto de una persona interesada en adoptar · US 2.1
+            Registra los datos de contacto de una persona interesada en adoptar
           </p>
         </div>
       </header>

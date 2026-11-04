@@ -277,7 +277,7 @@ export default async function InicioPage() {
             </h2>
             <p className="mt-4 flex items-center gap-2 text-base leading-[1.7] text-ink-700">
               <MapPin size={20} strokeWidth={2} aria-hidden="true" className="text-primary-600" />
-              Carrera 43A # 10-25, El Poblado · Medellín (dirección de muestra)
+              Carrera 43A # 10-25, El Poblado · Medellín
             </p>
             <p className="mt-2 text-sm leading-[1.7] text-ink-500">
               Jornadas de adopción sábados de 10:00 a 16:00. Escríbenos a

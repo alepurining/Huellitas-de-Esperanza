@@ -39,7 +39,7 @@ export default async function AdminMascotasPage({ searchParams }) {
           Mascotas registradas
         </h1>
         <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
-          {total} {total === 1 ? "ficha en el refugio" : "fichas en el refugio"} · US 1.2
+          {total} {total === 1 ? "ficha en el refugio" : "fichas en el refugio"}
         </p>
       </header>
 
