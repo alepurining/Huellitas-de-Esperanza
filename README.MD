@@ -4,7 +4,7 @@ Aplicacion web de gestión para el refugio de animales **Huellitas de Esperanza*
 fichas digitales de mascotas, registro de adoptantes, donaciones y solicitudes de adopción
 en línea con un panel privado para el equipo del refugio.
 
-![Stack](https://img.shields.io/badge/Next.js-15-black) ![DB](https://img.shields.io/badge/PostgreSQL-16.15+-blue) ![ORM](https://img.shields.io/badge/Prisma-6-darkgreen) ![Tailwind](https://img.shields.io/badge/Tailwind%20CSS-4-38bdf8)
+![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=nextdotjs) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?logo=postgresql&logoColor=white) ![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 
 ## Funcionalidades (MVP — Sprint 1)
 
