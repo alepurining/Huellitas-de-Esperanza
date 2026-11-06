@@ -15,7 +15,7 @@ export default function Sidebar({ sesion }) {
   const ruta = usePathname();
 
   return (
-    <aside className="flex flex-col gap-4 border-b border-[#eee5e8] bg-surface p-5 md:min-h-screen md:border-b-0 md:border-r md:py-[30px] md:px-5">
+    <aside className="flex flex-col gap-3 border-b border-[#eee5e8] bg-surface p-5 md:sticky md:top-0 md:h-screen md:overflow-y-auto md:self-start md:border-b-0 md:border-r md:py-6 md:px-5">
       <Link href="/" className="flex items-center gap-3">
         <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-50">
           <PawPrint size={26} strokeWidth={2} aria-hidden="true" className="text-primary" />
@@ -51,7 +51,7 @@ export default function Sidebar({ sesion }) {
         </ul>
       </nav>
 
-      <div className="md:mt-auto">
+      <div className="md:mt-auto md:pb-0">
         <div className="mb-3 flex items-center gap-3">
           <span className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[14px] bg-secondary text-[13px] font-extrabold text-secondary-ink">
             {String(sesion?.nombre ?? "?").slice(0, 1).toUpperCase()}

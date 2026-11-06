@@ -214,10 +214,7 @@ export default async function InicioPage() {
             })}
           </ul>
 
-          <p className="mt-6 max-w-[620px] text-[13px] leading-[1.6] text-ink-700">
-            Este proyecto no recibe pagos reales: el formulario público de donación es Sprint 2. Para
-            aportar, escríbenos o visítanos en la sección de ubicación.
-          </p>
+         
           <OutlineButton href="#ubicacion" className="mt-2">
             Ver ubicación y contacto
           </OutlineButton>
@@ -280,8 +277,8 @@ export default async function InicioPage() {
               Carrera 43A # 10-25, El Poblado · Medellín
             </p>
             <p className="mt-2 text-sm leading-[1.7] text-ink-500">
-              Jornadas de adopción sábados de 10:00 a 16:00. Escríbenos a
-              hola@huellitas.example.com.
+              Jornadas de adopción sábados de 10:00 am a 04:00 pm. Escríbenos a
+              adopcion02@huellitas.com
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">

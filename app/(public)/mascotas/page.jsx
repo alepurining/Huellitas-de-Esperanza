@@ -4,7 +4,8 @@ import PetCard from "@/components/PetCard";
 import Chip from "@/components/Chip";
 import EmptyState from "@/components/EmptyState";
 import PrimaryButton from "@/components/PrimaryButton";
-import { HeartHandshake } from "lucide-react";
+import { HeartHandshake, ArrowLeft } from "lucide-react";
+import GhostButton from "@/components/GhostButton";
 
 export const metadata = { title: "Mascotas en adopción" };
 
@@ -19,7 +20,12 @@ export default async function MascotasPage({ searchParams }) {
 
   return (
     <div className="mx-auto max-w-[1180px] px-4 py-12">
-      <p className="text-xs font-extrabold uppercase tracking-[1.7px] text-primary-600">
+      <div>
+        <GhostButton href="/" icono={ArrowLeft}>
+          Volver al inicio
+        </GhostButton>
+      </div>
+      <p className="mt-5 text-xs font-extrabold uppercase tracking-[1.7px] text-primary-600">
         Conoce a tu nuevo mejor amigo
       </p>
       <h1 className="mt-3 font-display text-[38px] leading-[1.1] text-ink md:text-5xl">

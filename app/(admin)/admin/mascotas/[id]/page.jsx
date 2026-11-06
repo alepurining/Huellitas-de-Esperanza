@@ -58,7 +58,7 @@ export default async function FichaStaffPage({ params }) {
               <PawPrint size={54} strokeWidth={2} aria-hidden="true" className="text-primary-200" />
             </div>
           )}
-          <div className="absolute left-3 top-3 md:hidden">
+          <div className="absolute right-3 top-3 md:hidden">
             <StatusBadge estado={mascota.estado} />
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { HeartHandshake, PawPrint, Stethoscope } from "lucide-react";
+import { ArrowLeft, HeartHandshake, PawPrint, Stethoscope } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import StatusBadge from "@/components/StatusBadge";
 import GhostButton from "@/components/GhostButton";
@@ -28,7 +28,9 @@ export default async function FichaPage({ params, searchParams }) {
 
   return (
     <div className="mx-auto max-w-[1180px] px-4 py-8">
-      <GhostButton href="/mascotas">← Volver al catálogo</GhostButton>
+      <GhostButton href="/mascotas" icono={ArrowLeft}>
+        Volver al catálogo
+      </GhostButton>
 
       <div className="mt-6 grid gap-8 md:grid-cols-2">
         <div className="relative overflow-hidden rounded-[140px_20px_20px_20px] border border-border-soft bg-surface">
@@ -43,7 +45,7 @@ export default async function FichaPage({ params, searchParams }) {
               <PawPrint size={64} strokeWidth={2} aria-hidden="true" className="text-primary-200" />
             </div>
           )}
-          <div className="absolute left-4 top-4">
+          <div className="absolute right-4 top-4">
             <StatusBadge estado={mascota.estado} />
           </div>
         </div>
