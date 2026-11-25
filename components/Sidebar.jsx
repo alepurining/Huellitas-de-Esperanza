@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HandHeart, LogOut, PawPrint, Users } from "lucide-react";
+import { ClipboardList, HandHeart, LogOut, PawPrint, Users } from "lucide-react";
 import { cerrarSesion } from "@/lib/actions/auth";
 
 const items = [
   { etiqueta: "Mascotas", href: "/admin/mascotas", icono: PawPrint },
   { etiqueta: "Adoptantes", href: "/admin/adoptantes", icono: Users },
   { etiqueta: "Donaciones", href: "/admin/donaciones", icono: HandHeart },
+  { etiqueta: "Solicitudes", href: "/admin/solicitudes", icono: ClipboardList },
 ];
 
 export default function Sidebar({ sesion }) {

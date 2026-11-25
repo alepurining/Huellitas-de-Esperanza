@@ -134,8 +134,9 @@ dialoga. Si algo de diseño no está en `STYLEGUIDE.md`, se propone allí primer
 | 12 | *(transversal)* | `Toast`, `Spinner`, `EmptyState`, `ErrorBanner` | Soporte | **refugio2** |
 | 13 | *(modal opcional)* | `AdoptionModal` — acceso rápido al mismo formulario desde la ficha | **MVP** | **refugio2** |
 | 14 | `/donar` | Un adoptante registrado declara un aporte para coordinar su entrega | **Sprint 2 implementado** | **refugio2** |
+| 15 | `/admin/solicitudes`, `/admin/solicitudes/[id]` | Bandeja, revisión y decisión sobre solicitudes (US 4.3) | **Sprint 2 implementado** | **refugio2** |
 
-**Sprint 2 pendiente:** `/admin/dashboard`, `/admin/solicitudes`,
+**Sprint 2 pendiente:** `/admin/dashboard`,
 edición/borrado de fichas, `DonationModal`, `ConfirmDangerModal`, `AdoptanteDetailModal`, filtros
 avanzados, correos y PDF.
 
@@ -411,7 +412,16 @@ avanzados, correos y PDF.
   `donacion` vinculada con `adoptante_id` en estado `por_coordinar`; el equipo puede marcarla recibida
   desde el panel. Las donaciones registradas por staff siguen vinculadas a `usuario_id` y cuentan como recibidas.
 
-### 13. Transversales — `Toast` y estados
+### 13. `/admin/solicitudes` — Revisión de solicitudes (Sprint 2)
+
+- **Bandeja:** lista todas las solicitudes, más recientes primero, mostrando adoptante, cédula, mascota,
+  fecha y estado. Cada fila enlaza al detalle.
+- **Detalle:** presenta la información de contacto del adoptante, la ficha de la mascota y las
+  condiciones del hogar indicadas en la solicitud.
+- **Decisión:** personal autenticado puede cambiar el estado a `en_revision`, `aprobada` o `rechazada`.
+  La decisión se guarda en `solicitud_adopcion.estado`.
+
+### 14. Transversales — `Toast` y estados
 
 - **`Toast`:** único patrón de éxito/error global (inferior centrado, `#374151`, icono `CircleCheck`
   mint, 3500ms). Textos en español: "Ficha guardada con éxito", "Adoptante registrado",
@@ -434,6 +444,7 @@ avanzados, correos y PDF.
 | `/admin/mascotas`, `/admin/mascotas/[id]` (lectura) | ❌ | ✅ | ✅ | ✅ |
 | `/admin/mascotas/nueva`, `/admin/adoptantes/nuevo` (altas) | ❌ | ✅ | ✅ | ✅ |
 | `/admin/adoptantes`, `/admin/donaciones` | ❌ | ✅ | ✅ | ✅ |
+| `/admin/solicitudes`, `/admin/solicitudes/[id]` | ❌ | ✅ | ✅ | ✅ |
 
 > Los tres roles acceden al panel en el MVP; no hay permisos diferenciados porque ninguna historia
 > Must los exige. La diferenciación fina (borrar fichas, verificar aportes) es Sprint 2.
@@ -446,7 +457,7 @@ avanzados, correos y PDF.
 |---|---|
 | `/donar` (formulario público de donación) | Implementado: disponible para adoptantes registrados; no procesa pagos en línea. |
 | `/admin/dashboard` | Pantalla de apoyo sin historia Must; tras el login se va a `/admin/mascotas`. |
-| `/admin/solicitudes` (bandeja y cambio de estado) | La solicitud se **registra** con US 4.1, pero gestionarla es US 4.3 (Should). |
+| `/admin/solicitudes` (bandeja y cambio de estado) | Implementado: revisión del detalle y cambio de estado (US 4.3, Sprint 2). |
 | Edición y borrado de fichas (`ConfirmDangerModal`) | US 1.3 (Should) y permisos finos. |
 | Edición de adoptantes, `AdoptanteDetailModal` | US 2.3 (Should) y US 2.4 (Could). |
 | `DonationModal` | Con el formulario en panel de `/admin/donaciones` la US 3.3 ya se cumple. |
@@ -463,7 +474,7 @@ avanzados, correos y PDF.
 |---|---|---|
 | `mascota` | `/`, `/mascotas*`, `/admin/mascotas*` | `nombre`, `raza`, `edad_estimada`, `especie`, `sexo`, `tamano`, `estado` (`en_adopcion`/`adoptado`), `personalidad`, `salud_resumen`, `foto_url`, `fecha_registro` |
 | `adoptante` | `AdoptionModal`, `/admin/adoptantes*`, `/donar` | `documento` (único, cédula), `nombre_completo`, `telefono`, `direccion`, `correo`, `estado` (`activo`), `fecha_registro` |
-| `solicitud_adopcion` | `AdoptionModal` | `mascota_id`, `adoptante_id`, `tipo_vivienda`, `animales_en_hogar`, `descripcion_vivienda`, `personas_en_hogar`, `acepta_terminos`, `estado` (`en_revision`), `fecha_solicitud` |
+| `solicitud_adopcion` | `AdoptionModal`, `/admin/solicitudes*` | `mascota_id`, `adoptante_id`, `tipo_vivienda`, `animales_en_hogar`, `descripcion_vivienda`, `personas_en_hogar`, `acepta_terminos`, `estado` (`en_revision`/`aprobada`/`rechazada`), `fecha_solicitud` |
 | `donacion` | `/admin/donaciones`, `/donar` | `tipo_aporte`, `estado` (`recibida`/`por_coordinar`), `monto` (entero, pesos), `descripcion_insumo`, `cantidad`, `nombre_donante`, `correo`, `fecha_donacion`, `usuario_id` (opcional), `adoptante_id` (opcional) |
 | `usuario` | `/login`, todo `/admin/*` | `nombre`, `correo`, `hash_contrasena`, `rol` (`administrador`/`veterinario`/`voluntario`) |
 

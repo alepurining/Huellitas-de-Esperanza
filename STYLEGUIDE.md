@@ -31,7 +31,7 @@ Síntesis acordada: **paleta de refugio2** + **anatomía píldora y grilla de re
   - Nunca prometer adopciones ni cobros reales: toda cifra, foto y contacto es de muestra → nota aclaratoria en secciones sensibles (donación, ubicación).
 - **Nomenclatura de secciones (navbar público):** **Inicio · Cómo ayudar · Nosotros · Ubicación · Iniciar sesión**.
   El catálogo (`/mascotas`) se alcanza desde los CTA del hero y de la sección de adopción, no desde el
-  navbar. Panel privado: `Sidebar` propio con **Mascotas · Adoptantes · Donaciones**.
+  navbar. Panel privado: `Sidebar` propio con **Mascotas · Adoptantes · Donaciones · Solicitudes**.
 - **Idioma:** todo el contenido de la app en español; columnas de tablas y campos en `snake_case` español.
 
 ---

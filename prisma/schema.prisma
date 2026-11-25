@@ -63,7 +63,7 @@ model SolicitudAdopcion {
   descripcion_vivienda String   @db.Text @map("descripcion_vivienda")
   personas_en_hogar    Int?     @map("personas_en_hogar")
   acepta_terminos      Boolean  @default(false) @map("acepta_terminos")
-  estado               String   @default("en_revision") @db.VarChar(20) // en_revision
+  estado               String   @default("en_revision") @db.VarChar(20) // en_revision | aprobada | rechazada
   fecha_solicitud      DateTime @default(now()) @map("fecha_solicitud")
 
   mascota   Mascota   @relation(fields: [mascota_id], references: [id])

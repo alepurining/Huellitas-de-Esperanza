@@ -65,10 +65,10 @@ veterinaria/
 │   │   │   ├── page.jsx                # /mascotas    → catálogo (US 1.2)
 │   │   │   └── [id]/
 │   │   │       └── page.jsx            # /mascotas/[id] → ficha + AdoptionModal (US 1.2 / 4.1)
-│   │   └── login/
-│   │       └── page.jsx                # /login       → acceso al panel
-│       ├── donar/
-│       │   └── page.jsx                # /donar        → aporte de adoptante registrado
+│   │   ├── login/
+│   │   │   └── page.jsx                # /login       → acceso al panel
+│   │   └── donar/
+│   │       └── page.jsx                # /donar        → aporte de adoptante registrado
 │   │
 │   └── (admin)/                        # Rutas privadas (JWT)
 │       ├── layout.jsx                  # Sidebar + guardia de sesión (verifica el JWT)
@@ -83,8 +83,12 @@ veterinaria/
 │           │   ├── page.jsx            # /admin/adoptantes      → listado + búsqueda (US 2.2)
 │           │   └── nuevo/
 │           │       └── page.jsx        # /admin/adoptantes/nuevo → alta (US 2.1)
-│           └── donaciones/
-│               └── page.jsx            # /admin/donaciones      → registro + tabla (US 3.3)
+│           ├── donaciones/
+│           │   └── page.jsx            # /admin/donaciones      → registro + tabla (US 3.3)
+│           └── solicitudes/
+│               ├── page.jsx            # /admin/solicitudes     → bandeja de revisión
+│               └── [id]/
+│                   └── page.jsx        # /admin/solicitudes/[id] → detalle + decisión
 │
 ├── components/                         # Un archivo por componente de STYLEGUIDE.md
 │   ├── PrimaryButton.jsx
@@ -118,7 +122,7 @@ veterinaria/
 │       ├── mascotas.js                 # crearMascota
 │       ├── adoptantes.js               # crearAdoptante
 │       ├── donaciones.js               # registrarDonacion / registrarDonacionAdoptante
-│       └── solicitudes.js              # crearSolicitudAdopcion
+│       └── solicitudes.js              # crearSolicitudAdopcion / actualizarEstadoSolicitud
 │
 ├── prisma/
 │   ├── schema.prisma
@@ -247,7 +251,7 @@ model SolicitudAdopcion {
   descripcion_vivienda String   @db.Text @map("descripcion_vivienda")
   personas_en_hogar    Int?     @map("personas_en_hogar")
   acepta_terminos      Boolean  @default(false) @map("acepta_terminos")
-  estado               String   @default("en_revision") @db.VarChar(20) // en_revision
+  estado               String   @default("en_revision") @db.VarChar(20) // en_revision | aprobada | rechazada
   fecha_solicitud      DateTime @default(now()) @map("fecha_solicitud")
 
   mascota   Mascota   @relation(fields: [mascota_id], references: [id])
@@ -434,8 +438,9 @@ Solo estas. Cualquier otra requiere justificación explícita.
    (`String(...)`, `Number(...)`, `Boolean(...)`).
 5. **Mensajes exactos** de `PAGES.md` centralizados en `lib/mensajes.js`:
    *"Ficha guardada con éxito"*, *"Adoptante registrado"*, *"Aporte registrado"*,
-   *"¡Solicitud enviada! Te contactaremos pronto."*, *"El número de documento ya se encuentra registrado"*,
-   *"Correo o contraseña incorrectos"*.
+   *"¡Gracias por tu aporte! El refugio coordinará contigo la entrega."*,
+   *"Estado de la solicitud actualizado."*, *"¡Solicitud enviada! Te contactaremos pronto."*,
+   *"El número de documento ya se encuentra registrado"*, *"Correo o contraseña incorrectos"*.
 6. **Diseño solo con `STYLEGUIDE.md`.** Usar los componentes con los nombres de `PAGES.md`
    (`PrimaryButton`, `SecondaryButton`, `MintButton`, `OutlineButton`, `Chip`, `PetCard`,
    `StatusBadge`, `DashPanel`, `PanelHeading`, `DataTable`, `FormField`, `AdoptionModal`, `Toast`,
@@ -446,12 +451,12 @@ Solo estas. Cualquier otra requiere justificación explícita.
    botones de solo icono con `aria-label`.
 8. **Accesibilidad mínima por pantalla:** un `<h1>`, landmarks `header/nav/main/footer`,
    `<label htmlFor>`, foco visible `#be4e89`, `Escape` cierra modal y menú, targets ≥44 px.
-9. **Prohibido en este sprint:** pasarelas de pago, envío de correos, PDF, uploads de archivos
+9. **Fuera de alcance por ahora:** pasarelas de pago, envío de correos, PDF, uploads de archivos
    (`foto_url` es una URL de texto), deploy, CI y tests automatizados. Los casos de prueba se
    documentan a mano en la plantilla de Confluence.
-10. **Prohibido adelantar Sprint 2:** edición/borrado de fichas, `/admin/solicitudes`,
-    `/admin/dashboard`, `/donar`, filtros avanzados, correos al adoptante, `DonationModal`,
-    `AdoptanteDetailModal`, `ConfirmDangerModal`.
+10. **Sprint 2 implementado por solicitud:** `/donar` y `/admin/solicitudes`. No adelantar otras
+    funcionalidades del Sprint 2: edición/borrado de fichas, `/admin/dashboard`, filtros avanzados,
+    correos al adoptante, `DonationModal`, `AdoptanteDetailModal`, `ConfirmDangerModal`.
 11. **Sin tipos.** Nada de `any`, interfaces, genéricos, `as` ni `z.infer`. La única red de
     seguridad es **Zod** validando en runtime antes de escribir en la base de datos; un campo mal
     escrito en Prisma falla en ejecución, así que se copian los nombres exactos del `schema.prisma`.
@@ -513,8 +518,8 @@ y en `lib/mensajes.js`; si hay que cambiar un color, solo en `STYLEGUIDE.md`.
 
 ### Fuera del alcance (Sprint 2) — no implementar
 
-`/donar` · `/admin/dashboard` · `/admin/solicitudes` · edición y borrado de fichas · edición de
-adoptantes · `DonationModal` · `AdoptanteDetailModal` · `ConfirmDangerModal` · filtros avanzados ·
+`/admin/dashboard` · edición y borrado de fichas · edición de adoptantes · `DonationModal` ·
+`AdoptanteDetailModal` · `ConfirmDangerModal` · filtros avanzados ·
 historial de donaciones · PDF · comprobantes · correos al adoptante · historial clínico ·
 tablas catálogo del diagrama E-R (`especie`, `raza`, `estado_salud`, `disponibilidad`, `ciudad`,
 `donante`) · módulo veterinario · gestión de voluntariado · deploy · CI · tests automatizados.
