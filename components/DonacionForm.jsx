@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { CircleAlert } from "lucide-react";
-import { registrarDonacion, registrarDonacionAdoptante } from "@/lib/actions/donaciones";
+import { registrarDonacion, registrarDonacionAdoptante, registrarDonacionPorAdoptante } from "@/lib/actions/donaciones";
 import FormField from "@/components/FormField";
 import MintButton from "@/components/MintButton";
 
@@ -37,19 +37,24 @@ const etiquetasCampos = {
   documento: "Cédula",
 };
 
-export default function DonacionForm({ publico = false }) {
-  const accionRegistro = publico ? registrarDonacionAdoptante : registrarDonacion;
+export default function DonacionForm({ publico = false, buscarAdoptante = false }) {
+  const accionRegistro = publico
+    ? registrarDonacionAdoptante
+    : buscarAdoptante
+    ? registrarDonacionPorAdoptante
+    : registrarDonacion;
   const [estado, accion, enviando] = useActionState(accionRegistro, null);
   const [tipo, setTipo] = useState("monetaria");
   const [monto, setMonto] = useState("");
   const formularioRef = useRef(null);
   const montoRef = useRef(null);
+  const camposFaltantes = estado?.camposFaltantes ?? [];
 
   useEffect(() => {
-    if (estado?.camposFaltantes?.length) {
+    if (camposFaltantes.length) {
       formularioRef.current?.querySelector('[aria-invalid="true"]')?.focus();
     }
-  }, [estado]);
+  }, [camposFaltantes.length]);
 
   const errorDe = (campo) => estado?.errores?.[campo];
   // React 19 resetea el form al terminar la action; estos valores evitan perder lo escrito.
@@ -195,17 +200,30 @@ export default function DonacionForm({ publico = false }) {
           </>
         ) : null}
 
-        {publico ? (
-          <FormField
-            etiqueta="Cédula registrada como adoptante"
-            nombre="documento"
-            defaultValue={valorDe("documento")}
-            inputMode="numeric"
-            maxLength={15}
-            placeholder="Solo números"
-            required
-            error={errorDe("documento")}
-          />
+        {(publico || buscarAdoptante) ? (
+          <>
+            <FormField
+              etiqueta={publico ? "Cédula registrada como adoptante" : "Cédula del adoptante"}
+              nombre="documento"
+              defaultValue={valorDe("documento")}
+              inputMode="numeric"
+              maxLength={15}
+              placeholder="Solo números"
+              required
+              error={errorDe("documento")}
+            />
+            <FormField
+              etiqueta="Correo electrónico"
+              nombre="correo"
+              defaultValue={valorDe("correo")}
+              tipo="email"
+              autoComplete="email"
+              maxLength={80}
+              placeholder="tucorreo@example.com"
+              ayuda="Opcional."
+              error={errorDe("correo")}
+            />
+          </>
         ) : (
           <>
             <FormField
@@ -235,7 +253,13 @@ export default function DonacionForm({ publico = false }) {
 
       <div className="mt-6">
         <MintButton type="submit" tamano="full" disabled={enviando}>
-          {enviando ? "Registrando…" : publico ? "Enviar aporte" : "Registrar aporte"}
+          {enviando
+            ? "Registrando…"
+            : publico
+            ? "Enviar aporte"
+            : buscarAdoptante
+            ? "Registrar aporte"
+            : "Registrar aporte"}
         </MintButton>
       </div>
     </form>

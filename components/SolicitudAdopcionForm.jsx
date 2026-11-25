@@ -36,7 +36,7 @@ export default function SolicitudAdopcionForm({
     if (camposFaltantes.length) {
       formularioRef.current?.querySelector('[aria-invalid="true"]')?.focus();
     }
-  }, [estado, camposFaltantes.length]);
+  }, [camposFaltantes.length]);
 
   const errorDe = (campo) =>
     estado?.errores?.[campo] ?? (camposFaltantes.includes(campo) ? "Revisa este dato" : undefined);

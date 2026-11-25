@@ -13,18 +13,20 @@ existe. No intentar "correr" nada hasta que se cree el proyecto.
 - **US 3.3** — Registro interno de donaciones monetarias o en especie (staff).
 - **US 4.1** — Formulario público de solicitud de adopción (adoptante, sin login).
 - Panel privado con login para 3 roles (`administrador`, `veterinario`, `voluntario`).
-- La salud se limita a un resumen (`salud_resumen`); el historial clínico es **US 1.5 (Won't Have)**.
+- La salud se limita a un resumen (`salud_resumen`); el historial clínico es **US 1.5 (Would)**.
 
-**Sprint 2 (todo lo demás)**: historias Should/Could/Won't y pantallas de apoyo no exigidas
-(formulario público de donación, dashboard, bandeja de solicitudes, edición/borrado de fichas,
-filtros, correos y PDF).
+**Sprint 2**: las **14 US del Sprint 2** (con su prioridad Should/Could/Would) están en
+**`sprint2US.md`** y **no se sacan de Confluence**. Por ahora el trabajo se centra en las
+Should/Could; las Would quedan fuera del alcance de momento .
 
 Restricciones explícitas del usuario (honrar siempre):
 - Es un proyecto de clase, **no se despliega**, no tiene que ser perfecto.
 - MVP = solo las **6 historias "Must Have"** del Sprint 1 (US 1.1, 1.2, 2.1, 2.2, 3.3, 4.1); todo lo demás va directo a **Sprint 2**.
 - Todo el texto/contenido del proyecto está en **español** (tablas, columnas y comentarios en snake_case español).
+- **Avisar siempre antes de hacer un commit** para que Elian lo revise antes de confirmarlo.
 
 **Calendario**: Sprint 1 = 23 oct – 4 nov 2026; entrega **4 nov 2026, 11:59 pm** (Classroom).
+**Calendario**: Sprint 2 = 23 oct – 26 nov 2026; entrega **26 nov 2026, 07:00 am** (Classroom).
 
 ## Diseño de la aplicación web
 **Todo lo relacionado con el diseño visual/UX de la app web vive en `STYLEGUIDE.md`**: paleta de
@@ -38,13 +40,18 @@ proponerlo primero y registrarlo allí. Los mockups están en Figma: **refugio1*
   - Espacio personal `ELIAN ALEJANDRO BLANDON LEGARDA`, key `~7120204b5fd5a250b645228fcc8d426b56f094`, spaceId `4259843`.
   - Carpeta `refugio` (id `46661637`) con las 2 páginas que mandan: **Refugio User Story Mapping** (`46858241`) y **Plantilla Sprint 1** (`46858277`).
   - El acceso es **solo lectura**: no intentar escribir en Confluence.
-- **Si los docs locales difieren de Confluence, manda Confluence.**
+  - Es la fuente de verdad **solo del Sprint 1**.
+- **`sprint2US.md`** (en el repo) — fuente de verdad de las **US del Sprint 2** y sus prioridades;
+  para Sprint 2 **no** consultar Confluence.
+- **Si los docs locales difieren de la fuente, manda la fuente**: para Sprint 1 Confluence y para
+  Sprint 2 `sprint2US.md`.
 
 ## Archivos locales
 - `Diagrama - Sprint 1 (MVP).png` — diagrama E-R original (aunque diga "Sprint 1", es el modelo completo).
 - `AGENTS.md` — este archivo: contexto del repo para agentes.
 - `STYLEGUIDE.md` — fuente única del diseño de la app web (ver sección anterior).
 - `PAGES.md` — mapa de pantallas, rutas y reglas del MVP (Sprint 1) y lo diferido a Sprint 2.
+- `sprint2US.md` — las 14 US del Sprint 2 con su prioridad (fuente de verdad del Sprint 2).
 - `ARCHITECTURE.md` — cómo se construye: estructura de carpetas, `schema.prisma`, autenticación y reglas
   de código (simplicidad primero: Prisma directo, Server Actions, sin capas intermedias).
 - `opencode.json` — solo declara MCP (`context7`, `atlassian`, `miro`, `figma`); contiene comentarios JSONC y un token,

@@ -1,11 +1,12 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import { CircleAlert, ImageIcon } from "lucide-react";
+import { CircleAlert, ImageIcon, Upload, X } from "lucide-react";
 import { crearMascota } from "@/lib/actions/mascotas";
 import FormField from "@/components/FormField";
 import PrimaryButton from "@/components/PrimaryButton";
 import OutlineButton from "@/components/OutlineButton";
+import GhostButton from "@/components/GhostButton";
 
 // El select puede quedar con la opción del placeholder seleccionada (""), igual que un vacío.
 const opcionesDe = (placeholder, opciones) => [{ valor: "", etiqueta: placeholder }, ...opciones];
@@ -13,17 +14,50 @@ const opcionesDe = (placeholder, opciones) => [{ valor: "", etiqueta: placeholde
 export default function MascotaForm() {
   const [estado, accion, enviando] = useActionState(crearMascota, null);
   const [fotoUrl, setFotoUrl] = useState("");
+  const [fotoPreview, setFotoPreview] = useState("");
   const formularioRef = useRef(null);
+  const inputFileRef = useRef(null);
+  const camposFaltantes = estado?.camposFaltantes ?? [];
 
   useEffect(() => {
-    if (estado?.camposFaltantes?.length) {
+    if (camposFaltantes.length) {
       formularioRef.current?.querySelector('[aria-invalid="true"]')?.focus();
     }
-  }, [estado]);
+  }, [camposFaltantes.length]);
 
   const errorDe = (campo) => estado?.errores?.[campo];
   // React 19 resetea el form al terminar la action; estos valores evitan perder lo escrito.
   const valorDe = (campo) => estado?.valores?.[campo] ?? "";
+
+  const manejarArchivo = (evento) => {
+    const archivo = evento.target.files[0];
+    if (!archivo) return;
+    
+    if (!archivo.type.startsWith("image/")) {
+      alert("Solo se permiten archivos de imagen");
+      return;
+    }
+    
+    if (archivo.size > 5 * 1024 * 1024) {
+      alert("La imagen no debe superar 5 MB");
+      return;
+    }
+    
+    const objectUrl = URL.createObjectURL(archivo);
+    setFotoPreview(objectUrl);
+    setFotoUrl(objectUrl);
+  };
+
+  const limpiarFoto = () => {
+    if (fotoPreview.startsWith("blob:")) {
+      URL.revokeObjectURL(fotoPreview);
+    }
+    setFotoPreview("");
+    setFotoUrl("");
+    if (inputFileRef.current) {
+      inputFileRef.current.value = "";
+    }
+  };
 
   return (
     <form ref={formularioRef} action={accion} noValidate>
@@ -117,24 +151,59 @@ export default function MascotaForm() {
           error={errorDe("estado")}
         />
         <div>
-          <FormField
-            etiqueta="Foto (URL)"
-            nombre="foto_url"
-            defaultValue={valorDe("foto_url")}
-            tipo="url"
-            autoComplete="off"
-            maxLength={255}
-            placeholder="https://…/foto.jpg"
-            ayuda="Opcional. Pega el enlace de una imagen en línea."
-            onChange={(evento) => setFotoUrl(evento.target.value)}
-            error={errorDe("foto_url")}
-          />
-          {fotoUrl.trim() ? (
-            <img
-              src={fotoUrl}
-              alt="Vista previa de la foto"
-              className="mt-2 h-24 w-full rounded-[14px] border border-border-soft object-cover"
+          <div className="mb-2 flex items-center gap-2">
+            <FormField
+              etiqueta="Foto de la mascota"
+              nombre="foto_url"
+              defaultValue={valorDe("foto_url")}
+              tipo="url"
+              autoComplete="off"
+              maxLength={255}
+              placeholder="url de la imagen"
+              ayuda="Opcional. Pega el enlace de una imagen en línea."
+              onChange={(evento) => {
+                setFotoUrl(evento.target.value);
+                if (evento.target.value.trim() && !evento.target.value.startsWith("blob:")) {
+                  setFotoPreview(evento.target.value);
+                } else if (!evento.target.value.trim()) {
+                  setFotoPreview("");
+                }
+              }}
+              error={errorDe("foto_url")}
+              className="flex-1"
             />
+            <label
+              htmlFor="foto_archivo"
+              className="shrink-0 rounded-input border border-border-soft bg-surface px-3 py-3 font-sans text-[15px] font-normal text-ink outline-none transition duration-200 hover:bg-primary-50 hover:text-[#b74581] cursor-pointer"
+            >
+              <input
+                ref={inputFileRef}
+                id="foto_archivo"
+                type="file"
+                accept="image/*"
+                onChange={manejarArchivo}
+                className="sr-only"
+                aria-label="Subir foto desde archivo"
+              />
+              <Upload size={20} strokeWidth={2} aria-hidden="true" />
+            </label>
+          </div>
+          {fotoPreview ? (
+            <div className="relative mt-2 rounded-[14px] border border-border-soft overflow-hidden">
+              <img
+                src={fotoPreview}
+                alt="Vista previa de la foto"
+                className="h-32 w-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={limpiarFoto}
+                className="absolute right-2 top-2 rounded-full bg-white/90 p-1 transition hover:bg-white"
+                aria-label="Eliminar foto"
+              >
+                <X size={16} strokeWidth={2} aria-hidden="true" className="text-ink-500" />
+              </button>
+            </div>
           ) : (
             <p className="mt-2 flex items-center gap-1.5 text-xs text-ink-400">
               <ImageIcon size={14} strokeWidth={2} aria-hidden="true" />

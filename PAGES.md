@@ -79,14 +79,16 @@ dialoga. Si algo de diseño no está en `STYLEGUIDE.md`, se propone allí primer
 - Adoptantes y donantes **nunca tienen login**: sus formularios son públicos.
 - **Estados de la mascota (únicos del Sprint 1):** `en_adopcion` (etiqueta visible **"Disponible"**) y `adoptado`.
   "Disponible" es una etiqueta de interfaz; el valor guardado sigue siendo `en_adopcion`. No se usa "reservado".
-- **No** hay historial médico (US 1.5 = Won't Have): la salud es un solo campo `salud_resumen`.
+- **No** hay historial médico (US 1.5 = Would): la salud es un solo campo `salud_resumen`.
 - **No** hay gestión de voluntariado ni módulo de salud veterinaria: no existen en Confluence.
 - El MVP es **concepto/demo**: sin pasarela de pago real, sin correos reales, cifras/fotos/contactos de muestra
   (banda "modo demo" del styleguide en las páginas públicas).
 
 ---
 
-## Backlog MoSCoW (Confluence) y destino por sprint
+## Backlog MoSCoW y destino por sprint
+
+> Sprint 1 tomado de Confluence; prioridades del Sprint 2 tomadas de **`sprint2US.md`** (fuente de verdad).
 
 | US | Historia | Prioridad | Sprint |
 |---|---|---|---|
@@ -103,15 +105,15 @@ dialoga. Si algo de diseño no está en `STYLEGUIDE.md`, se propone allí primer
 | US 4.3 | Cambiar el estado de las solicitudes de adopción (en revisión, aprobada, rechazada). | Should | 2 |
 | US 1.4 | Filtrar la visualización de los animales por su información (adoptante). | Could | 2 |
 | US 2.4 | Visualizar qué animales ha adoptado un adoptante concreto. | Could | 2 |
-| US 3.4 | Recibir un comprobante o confirmación de la donación (donante). | Could | 2 |
+| US 3.4 | Recibir un comprobante o confirmación de la donación (donante). | Should | 2 |
 | US 3.5 | Consultar y filtrar el historial de donaciones por tipo o fecha. | Could | 2 |
-| US 1.5 | Historiales clínicos en PDF. | Won't | 2 |
-| US 3.2 | Informes de gasto. | Won't | 2 |
-| US 4.2 | Vincular el perfil del adoptante con veterinarias socias (cupones). | Won't | 2 |
-| US 4.4 | Reportes mensuales. | Won't | 2 |
-| US 4.5 | Encuestas post-adopción. | Won't | 2 |
+| US 1.5 | Historiales clínicos en PDF. | Would | 2 |
+| US 3.2 | Informes de gasto. | Would | 2 |
+| US 4.2 | Vincular el perfil del adoptante con veterinarias socias (cupones). | Would | 2 |
+| US 4.4 | Reportes mensuales. | Would | 2 |
+| US 4.5 | Encuestas post-adopción. | Would | 2 |
 
-> Sprint 2 agrupa **todo** lo que no sea Must: historias Should/Could/Won't y las pantallas de apoyo
+> Sprint 2 agrupa **todo** lo que no sea Must: historias Should/Could/Would y las pantallas de apoyo
 > que no exige ninguna Must (ver *Fuera del alcance* al final).
 
 ---
@@ -462,8 +464,8 @@ avanzados, correos y PDF.
 | Edición de adoptantes, `AdoptanteDetailModal` | US 2.3 (Should) y US 2.4 (Could). |
 | `DonationModal` | Con el formulario en panel de `/admin/donaciones` la US 3.3 ya se cumple. |
 | Filtros avanzados, historial de donaciones, PDF, comprobantes | US 1.4, 3.1, 3.4, 3.5 (Could/Should). |
-| Correos o mensajes al adoptante | US 2.5 (Should) y US 4.2 (Won't). |
-| Historial clínico, informes de gasto, veterinarias socias, reportes, encuestas | US 1.5, 3.2, 4.2, 4.4, 4.5 (Won't). |
+| Correos o mensajes al adoptante | US 2.5 (Should) y US 4.2 (Would). |
+| Historial clínico, informes de gasto, veterinarias socias, reportes, encuestas | US 1.5, 3.2, 4.2, 4.4, 4.5 (Would). |
 | Módulo de salud veterinaria y gestión de voluntariado | **No existen en Confluence**: no forman parte del proyecto. "Voluntariado" solo aparece como texto informativo en la landing. |
 
 ---
