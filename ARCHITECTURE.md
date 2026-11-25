@@ -67,6 +67,8 @@ veterinaria/
 │   │   │       └── page.jsx            # /mascotas/[id] → ficha + AdoptionModal (US 1.2 / 4.1)
 │   │   └── login/
 │   │       └── page.jsx                # /login       → acceso al panel
+│       ├── donar/
+│       │   └── page.jsx                # /donar        → aporte de adoptante registrado
 │   │
 │   └── (admin)/                        # Rutas privadas (JWT)
 │       ├── layout.jsx                  # Sidebar + guardia de sesión (verifica el JWT)
@@ -115,7 +117,7 @@ veterinaria/
 │       ├── auth.js                     # iniciarSesion / cerrarSesion
 │       ├── mascotas.js                 # crearMascota
 │       ├── adoptantes.js               # crearAdoptante
-│       ├── donaciones.js               # registrarDonacion
+│       ├── donaciones.js               # registrarDonacion / registrarDonacionAdoptante
 │       └── solicitudes.js              # crearSolicitudAdopcion
 │
 ├── prisma/
@@ -231,6 +233,7 @@ model Adoptante {
   estado          String   @default("activo") @db.VarChar(20) // activo | inactivo
   fecha_registro  DateTime @default(now()) @map("fecha_registro")
   solicitudes     SolicitudAdopcion[]
+  donaciones      Donacion[]
 
   @@map("adoptante")
 }
@@ -256,15 +259,18 @@ model SolicitudAdopcion {
 model Donacion {
   id                 Int      @id @default(autoincrement()) @map("id_donacion")
   tipo_aporte        String   @db.VarChar(20) @map("tipo_aporte") // monetaria | especie
+  estado             String   @default("recibida") @db.VarChar(20) // recibida | por_coordinar
   monto              Int?     // pesos COP, sin decimales (demo)
   descripcion_insumo String?  @db.Text @map("descripcion_insumo")
   cantidad           Int?
   nombre_donante     String   @db.VarChar(80) @map("nombre_donante")
   correo             String?  @db.VarChar(80)
   fecha_donacion     DateTime @default(now()) @map("fecha_donacion")
-  usuario_id         Int      @map("usuario_id") // quién registró el aporte
+  usuario_id         Int?     @map("usuario_id") // quién registró el aporte en el panel
+  adoptante_id       Int?     @map("adoptante_id")
 
-  usuario Usuario @relation(fields: [usuario_id], references: [id])
+  usuario   Usuario?   @relation(fields: [usuario_id], references: [id])
+  adoptante Adoptante? @relation(fields: [adoptante_id], references: [id])
 
   @@map("donacion")
 }
@@ -473,7 +479,8 @@ Reglas de negocio que viven en esas acciones y en ningún otro sitio:
   texto exacto. El `@unique` es la red de seguridad ante condiciones de carrera.
 - **US 4.1:** busca al adoptante por `documento`; si no existe, lo crea con `estado = "activo"` y
   luego crea la solicitud con `estado = "en_revision"`. Todo en un `prisma.$transaction`.
-- **US 3.3:** `usuario_id` sale de la sesión (`getSesion()`), nunca del formulario.
+- **US 3.3:** para aportes registrados por staff, `usuario_id` sale de la sesión (`getSesion()`), nunca
+  del formulario. `/donar` valida una cédula existente y vincula el aporte con `adoptante_id`.
 
 ### Equivalencia con los endpoints de `PAGES.md`
 

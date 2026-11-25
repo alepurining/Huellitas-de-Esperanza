@@ -4,6 +4,7 @@ import PetCard from "@/components/PetCard";
 import PrimaryButton from "@/components/PrimaryButton";
 import OutlineButton from "@/components/OutlineButton";
 import GhostButton from "@/components/GhostButton";
+import MintButton from "@/components/MintButton";
 import EmptyState from "@/components/EmptyState";
 
 export const dynamic = "force-dynamic";
@@ -215,9 +216,14 @@ export default async function InicioPage() {
           </ul>
 
          
-          <OutlineButton href="#ubicacion" className="mt-2">
-            Ver ubicación y contacto
-          </OutlineButton>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <MintButton href="/donar" icono={HeartHandshake}>
+              Quiero donar
+            </MintButton>
+            <OutlineButton href="#ubicacion">
+              Ver ubicación y contacto
+            </OutlineButton>
+          </div>
         </div>
       </section>
 

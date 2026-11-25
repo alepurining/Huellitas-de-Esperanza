@@ -49,6 +49,7 @@ model Adoptante {
   estado          String   @default("activo") @db.VarChar(20) // activo | inactivo
   fecha_registro  DateTime @default(now()) @map("fecha_registro")
   solicitudes     SolicitudAdopcion[]
+  donaciones      Donacion[]
 
   @@map("adoptante")
 }
@@ -74,15 +75,18 @@ model SolicitudAdopcion {
 model Donacion {
   id                 Int      @id @default(autoincrement()) @map("id_donacion")
   tipo_aporte        String   @db.VarChar(20) @map("tipo_aporte") // monetaria | especie
+  estado             String   @default("recibida") @db.VarChar(20) // recibida | por_coordinar
   monto              Int?     // pesos COP, sin decimales (demo)
   descripcion_insumo String?  @db.Text @map("descripcion_insumo")
   cantidad           Int?
   nombre_donante     String   @db.VarChar(80) @map("nombre_donante")
   correo             String?  @db.VarChar(80)
   fecha_donacion     DateTime @default(now()) @map("fecha_donacion")
-  usuario_id         Int      @map("usuario_id") // quién registró el aporte
+  usuario_id         Int?     @map("usuario_id") // quién registró el aporte en el panel
+  adoptante_id       Int?     @map("adoptante_id")
 
-  usuario Usuario @relation(fields: [usuario_id], references: [id])
+  usuario   Usuario?   @relation(fields: [usuario_id], references: [id])
+  adoptante Adoptante? @relation(fields: [adoptante_id], references: [id])
 
   @@map("donacion")
 }

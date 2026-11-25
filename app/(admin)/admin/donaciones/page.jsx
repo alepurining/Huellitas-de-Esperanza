@@ -7,6 +7,8 @@ import Toast from "@/components/Toast";
 import EmptyState from "@/components/EmptyState";
 import { HandHeart } from "lucide-react";
 import { mensajes } from "@/lib/mensajes";
+import { confirmarRecepcionDonacion } from "@/lib/actions/donaciones";
+import PrimaryButton from "@/components/PrimaryButton";
 
 export const metadata = { title: "Donaciones" };
 
@@ -23,14 +25,17 @@ export default async function AdminDonacionesPage({ searchParams }) {
   const idNuevo = typeof nuevo === "string" ? Number(nuevo) : 0;
 
   const [donaciones, donacionNueva] = await Promise.all([
-    prisma.donacion.findMany({ orderBy: { fecha_donacion: "desc" } }),
+    prisma.donacion.findMany({
+      include: { adoptante: { select: { documento: true } } },
+      orderBy: { fecha_donacion: "desc" },
+    }),
     Number.isSafeInteger(idNuevo) && idNuevo > 0
       ? prisma.donacion.findUnique({ where: { id: idNuevo } })
       : Promise.resolve(null),
   ]);
 
   const totalMonetario = donaciones
-    .filter((donacion) => donacion.tipo_aporte === "monetaria")
+    .filter((donacion) => donacion.tipo_aporte === "monetaria" && donacion.estado === "recibida")
     .reduce((suma, donacion) => suma + (donacion.monto ?? 0), 0);
 
   return (
@@ -56,8 +61,8 @@ export default async function AdminDonacionesPage({ searchParams }) {
 
       <DashPanel>
         <PanelHeading
-          titulo="Aportes recibidos"
-          subtitulo={`Dinero registrado: ${moneda.format(totalMonetario)} · Los aportes en especie se cuentan por cantidad.`}
+          titulo="Aportes registrados"
+          subtitulo={`Dinero recibido: ${moneda.format(totalMonetario)} · Los aportes en especie se cuentan por cantidad.`}
         />
 
         {donaciones.length === 0 ? (
@@ -68,7 +73,7 @@ export default async function AdminDonacionesPage({ searchParams }) {
           />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] border-collapse text-left">
+            <table className="w-full min-w-[760px] border-collapse text-left">
               <caption className="sr-only">Donaciones registradas</caption>
               <thead>
                 <tr className="text-[11px] font-bold uppercase tracking-[1.7px] text-ink-500">
@@ -84,6 +89,9 @@ export default async function AdminDonacionesPage({ searchParams }) {
                   <th scope="col" className="py-2">
                     Detalle
                   </th>
+                  <th scope="col" className="py-2">
+                    Estado
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -94,6 +102,11 @@ export default async function AdminDonacionesPage({ searchParams }) {
                     </td>
                     <td className="py-3 text-[14px] font-extrabold text-ink">
                       {donacion.nombre_donante}
+                      {donacion.adoptante ? (
+                        <span className="block text-[11px] font-semibold text-ink-500">
+                          Adoptante · cédula {donacion.adoptante.documento}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="py-3">
                       <StatusBadge estado={donacion.tipo_aporte} />
@@ -102,6 +115,18 @@ export default async function AdminDonacionesPage({ searchParams }) {
                       {donacion.tipo_aporte === "monetaria"
                         ? moneda.format(donacion.monto ?? 0)
                         : `${donacion.cantidad ?? 0} × ${donacion.descripcion_insumo ?? "insumo"}`}
+                    </td>
+                    <td className="py-3">
+                      {donacion.estado === "por_coordinar" ? (
+                        <form action={confirmarRecepcionDonacion}>
+                          <input type="hidden" name="id" value={donacion.id} />
+                          <PrimaryButton type="submit" tamano="sm">
+                            Marcar recibido
+                          </PrimaryButton>
+                        </form>
+                      ) : (
+                        <StatusBadge estado={donacion.estado} />
+                      )}
                     </td>
                   </tr>
                 ))}

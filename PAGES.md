@@ -133,8 +133,9 @@ dialoga. Si algo de diseño no está en `STYLEGUIDE.md`, se propone allí primer
 | 11 | `/admin/donaciones` | Registro y consulta de donaciones (US 3.3) | **MVP** | **refugio2** (tabla + formulario) |
 | 12 | *(transversal)* | `Toast`, `Spinner`, `EmptyState`, `ErrorBanner` | Soporte | **refugio2** |
 | 13 | *(modal opcional)* | `AdoptionModal` — acceso rápido al mismo formulario desde la ficha | **MVP** | **refugio2** |
+| 14 | `/donar` | Un adoptante registrado declara un aporte para coordinar su entrega | **Sprint 2 implementado** | **refugio2** |
 
-**Sprint 2 (no implementar ahora):** `/donar`, `/admin/dashboard`, `/admin/solicitudes`,
+**Sprint 2 pendiente:** `/admin/dashboard`, `/admin/solicitudes`,
 edición/borrado de fichas, `DonationModal`, `ConfirmDangerModal`, `AdoptanteDetailModal`, filtros
 avanzados, correos y PDF.
 
@@ -165,9 +166,8 @@ avanzados, correos y PDF.
      CTA de sección → `/mascotas`.
   6. **Proceso de adopción** (id `#proceso`): introducción + pasos numerados (numeración terracota `#b94f35`).
   7. **Cómo ayudar** (id `#ayudar`, banda salvia oscura `#cfe0c4`): mensaje + descripción + **3 formas de ayudar**
-     (donar, hogar temporal, difusión) en tarjetas informativas. **Sin formulario ni pasarela**:
-     los botones son informativos y remiten a la sección de ubicación/contacto (el formulario público de
-     donación es Sprint 2).
+     (donar, hogar temporal, difusión) en tarjetas informativas. El botón "Quiero donar" enlaza a `/donar`;
+     no hay pasarela de pago.
   8. **Nosotros** (id `#nosotros`, de la sección "El refugio" de refugio1): quiénes somos (misión y
      visión del refugio), la comunidad (voluntarios y aliados, en texto) y **pilares de cuidado**
      (iconos `heart-handshake`, `house`, `stethoscope`… a elección del styleguide) en 3 tarjetas.
@@ -397,13 +397,26 @@ avanzados, correos y PDF.
 - **Datos y Backend:** `GET /api/donaciones?tipo=&pagina=` y `POST /api/donaciones` con
   `{ tipo_aporte, monto?, descripcion_insumo?, cantidad?, nombre_donante, correo? }`.
   Campos: `tipo_aporte` (`monetaria` | `especie`), `monto`, `descripcion_insumo`, `cantidad`,
-  `nombre_donante`, `correo`, `fecha_donacion`, `usuario_id` (quien registró). **Sin** pasarela de pago.
+  `nombre_donante`, `correo`, `fecha_donacion`, `estado` (`recibida` | `por_coordinar`),
+  `usuario_id` (quien registró) y `adoptante_id` (opcional). Los aportes enviados desde `/donar`
+  se asocian al adoptante y quedan `por_coordinar`; el total monetario cuenta solo los recibidos.
 
-### 12. Transversales — `Toast` y estados
+### 12. `/donar` — Aporte de adoptante registrado (Sprint 2)
+
+- **Propósito:** Permitir que un adoptante existente deje constancia de un aporte monetario o en especie
+  para coordinar su entrega. No hay pasarela ni cobros en línea.
+- **Entrada:** botón "Quiero donar" en la sección "Cómo ayudar" de la landing.
+- **Formulario:** cédula (debe existir en `adoptante`), tipo de aporte y detalle según sea dinero o insumo.
+- **Backend:** la Server Action comprueba la cédula, toma nombre y correo del registro existente y crea
+  `donacion` vinculada con `adoptante_id` en estado `por_coordinar`; el equipo puede marcarla recibida
+  desde el panel. Las donaciones registradas por staff siguen vinculadas a `usuario_id` y cuentan como recibidas.
+
+### 13. Transversales — `Toast` y estados
 
 - **`Toast`:** único patrón de éxito/error global (inferior centrado, `#374151`, icono `CircleCheck`
   mint, 3500ms). Textos en español: "Ficha guardada con éxito", "Adoptante registrado",
-  "Aporte registrado", "¡Solicitud enviada! Te contactaremos pronto.".
+  "Aporte registrado", "¡Gracias por tu aporte! El refugio coordinará contigo la entrega.",
+  "¡Solicitud enviada! Te contactaremos pronto.".
 - **Estados globales (de `STYLEGUIDE.md`):** `Spinner` (`Loader2`), `EmptyState` (icono + H3 Fraunces + CTA),
   `ErrorBanner` (`CircleAlert` + "Reintentar"), bloque Info (azul) para avisos de demo y banda
   "modo demo" en las páginas públicas.
@@ -431,7 +444,7 @@ avanzados, correos y PDF.
 
 | Ruta / pieza | Por qué no va en Sprint 1 |
 |---|---|
-| `/donar` (formulario público de donación) | No es una Must: US 3.3 es el registro **interno** por staff. El panel de aportes de la landing queda solo informativo. |
+| `/donar` (formulario público de donación) | Implementado: disponible para adoptantes registrados; no procesa pagos en línea. |
 | `/admin/dashboard` | Pantalla de apoyo sin historia Must; tras el login se va a `/admin/mascotas`. |
 | `/admin/solicitudes` (bandeja y cambio de estado) | La solicitud se **registra** con US 4.1, pero gestionarla es US 4.3 (Should). |
 | Edición y borrado de fichas (`ConfirmDangerModal`) | US 1.3 (Should) y permisos finos. |
@@ -449,9 +462,9 @@ avanzados, correos y PDF.
 | Tabla (snake_case) | Rutas que la usan | Campos clave derivados de las HU |
 |---|---|---|
 | `mascota` | `/`, `/mascotas*`, `/admin/mascotas*` | `nombre`, `raza`, `edad_estimada`, `especie`, `sexo`, `tamano`, `estado` (`en_adopcion`/`adoptado`), `personalidad`, `salud_resumen`, `foto_url`, `fecha_registro` |
-| `adoptante` | `AdoptionModal`, `/admin/adoptantes*` | `documento` (único, cédula), `nombre_completo`, `telefono`, `direccion`, `correo`, `estado` (`activo`), `fecha_registro` |
+| `adoptante` | `AdoptionModal`, `/admin/adoptantes*`, `/donar` | `documento` (único, cédula), `nombre_completo`, `telefono`, `direccion`, `correo`, `estado` (`activo`), `fecha_registro` |
 | `solicitud_adopcion` | `AdoptionModal` | `mascota_id`, `adoptante_id`, `tipo_vivienda`, `animales_en_hogar`, `descripcion_vivienda`, `personas_en_hogar`, `acepta_terminos`, `estado` (`en_revision`), `fecha_solicitud` |
-| `donacion` | `/admin/donaciones` | `tipo_aporte`, `monto` (entero, pesos), `descripcion_insumo`, `cantidad`, `nombre_donante`, `correo`, `fecha_donacion`, `usuario_id` |
+| `donacion` | `/admin/donaciones`, `/donar` | `tipo_aporte`, `estado` (`recibida`/`por_coordinar`), `monto` (entero, pesos), `descripcion_insumo`, `cantidad`, `nombre_donante`, `correo`, `fecha_donacion`, `usuario_id` (opcional), `adoptante_id` (opcional) |
 | `usuario` | `/login`, todo `/admin/*` | `nombre`, `correo`, `hash_contrasena`, `rol` (`administrador`/`veterinario`/`voluntario`) |
 
 El diagrama E-R de referencia está en `Diagrama - Sprint 1 (MVP).png` (es el modelo completo del

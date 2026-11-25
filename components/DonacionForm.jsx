@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { CircleAlert } from "lucide-react";
-import { registrarDonacion } from "@/lib/actions/donaciones";
+import { registrarDonacion, registrarDonacionAdoptante } from "@/lib/actions/donaciones";
 import FormField from "@/components/FormField";
 import MintButton from "@/components/MintButton";
 
@@ -34,10 +34,12 @@ const etiquetasCampos = {
   descripcion_insumo: "Descripción del insumo",
   cantidad: "Cantidad",
   nombre_donante: "Nombre del donante",
+  documento: "Cédula",
 };
 
-export default function DonacionForm() {
-  const [estado, accion, enviando] = useActionState(registrarDonacion, null);
+export default function DonacionForm({ publico = false }) {
+  const accionRegistro = publico ? registrarDonacionAdoptante : registrarDonacion;
+  const [estado, accion, enviando] = useActionState(accionRegistro, null);
   const [tipo, setTipo] = useState("monetaria");
   const [monto, setMonto] = useState("");
   const formularioRef = useRef(null);
@@ -189,30 +191,44 @@ export default function DonacionForm() {
           </>
         ) : null}
 
-        <FormField
-          etiqueta="Nombre del donante"
-          nombre="nombre_donante"
-          autoComplete="name"
-          maxLength={80}
-          placeholder="María Fernanda Gómez"
-          required
-          error={errorDe("nombre_donante")}
-        />
-        <FormField
-          etiqueta="Correo electrónico"
-          nombre="correo"
-          tipo="email"
-          autoComplete="email"
-          maxLength={80}
-          placeholder="tucorreo@example.com"
-          ayuda="Opcional."
-          error={errorDe("correo")}
-        />
+        {publico ? (
+          <FormField
+            etiqueta="Cédula registrada como adoptante"
+            nombre="documento"
+            inputMode="numeric"
+            maxLength={15}
+            placeholder="Solo números"
+            required
+            error={errorDe("documento")}
+          />
+        ) : (
+          <>
+            <FormField
+              etiqueta="Nombre del donante"
+              nombre="nombre_donante"
+              autoComplete="name"
+              maxLength={80}
+              placeholder="María Fernanda Gómez"
+              required
+              error={errorDe("nombre_donante")}
+            />
+            <FormField
+              etiqueta="Correo electrónico"
+              nombre="correo"
+              tipo="email"
+              autoComplete="email"
+              maxLength={80}
+              placeholder="tucorreo@example.com"
+              ayuda="Opcional."
+              error={errorDe("correo")}
+            />
+          </>
+        )}
       </div>
 
       <div className="mt-6">
         <MintButton type="submit" tamano="full" disabled={enviando}>
-          {enviando ? "Registrando…" : "Registrar aporte"}
+          {enviando ? "Registrando…" : publico ? "Enviar aporte" : "Registrar aporte"}
         </MintButton>
       </div>
     </form>
