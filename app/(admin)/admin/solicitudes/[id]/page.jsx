@@ -124,23 +124,28 @@ export default async function AdminSolicitudDetallePage({ params, searchParams }
           <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
             Registra la decisión del equipo para esta solicitud.
           </p>
-          <form action={actualizarEstadoSolicitud} className="mt-5 flex flex-col gap-3 sm:flex-row">
-            <input type="hidden" name="id" value={solicitud.id} />
-            <OutlineButton type="submit" name="estado" value="en_revision">
-              En revisión
-            </OutlineButton>
-            <PrimaryButton type="submit" name="estado" value="aprobada">
-              Aprobar
-            </PrimaryButton>
-            <OutlineButton
-              type="submit"
-              name="estado"
-              value="rechazada"
-              className="border-danger text-danger-700 hover:bg-danger-50"
-            >
-              Rechazar
-            </OutlineButton>
-          </form>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <form action={actualizarEstadoSolicitud}>
+              <input type="hidden" name="id" value={solicitud.id} />
+              <input type="hidden" name="estado" value="en_revision" />
+              <OutlineButton type="submit">En revisión</OutlineButton>
+            </form>
+            <form action={actualizarEstadoSolicitud}>
+              <input type="hidden" name="id" value={solicitud.id} />
+              <input type="hidden" name="estado" value="aprobada" />
+              <PrimaryButton type="submit">Aprobar</PrimaryButton>
+            </form>
+            <form action={actualizarEstadoSolicitud}>
+              <input type="hidden" name="id" value={solicitud.id} />
+              <input type="hidden" name="estado" value="rechazada" />
+              <OutlineButton
+                type="submit"
+                className="border-danger text-danger-700 hover:bg-danger-50"
+              >
+                Rechazar
+              </OutlineButton>
+            </form>
+          </div>
         </DashPanel>
       </div>
     </div>
