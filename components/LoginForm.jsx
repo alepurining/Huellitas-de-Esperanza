@@ -28,6 +28,7 @@ export default function LoginForm() {
         tipo="email"
         placeholder="admin@huellitas.co"
         autoComplete="email"
+        defaultValue={estado?.valores?.correo ?? ""}
         required
         error={errorDe("correo")}
       />

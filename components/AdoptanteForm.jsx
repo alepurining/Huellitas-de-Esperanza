@@ -18,6 +18,8 @@ export default function AdoptanteForm() {
   }, [estado]);
 
   const errorDe = (campo) => estado?.errores?.[campo];
+  // React 19 resetea el form al terminar la action; estos valores evitan perder lo escrito.
+  const valorDe = (campo) => estado?.valores?.[campo] ?? "";
 
   return (
     <form ref={formularioRef} action={accion} noValidate>
@@ -35,6 +37,7 @@ export default function AdoptanteForm() {
         <FormField
           etiqueta="Cédula"
           nombre="documento"
+          defaultValue={valorDe("documento")}
           inputMode="numeric"
           autoComplete="off"
           maxLength={15}
@@ -46,6 +49,7 @@ export default function AdoptanteForm() {
         <FormField
           etiqueta="Nombre completo"
           nombre="nombre_completo"
+          defaultValue={valorDe("nombre_completo")}
           autoComplete="name"
           maxLength={80}
           placeholder="María Fernanda Gómez"
@@ -55,6 +59,7 @@ export default function AdoptanteForm() {
         <FormField
           etiqueta="Teléfono"
           nombre="telefono"
+          defaultValue={valorDe("telefono")}
           inputMode="numeric"
           autoComplete="tel"
           maxLength={10}
@@ -66,6 +71,7 @@ export default function AdoptanteForm() {
         <FormField
           etiqueta="Correo electrónico"
           nombre="correo"
+          defaultValue={valorDe("correo")}
           tipo="email"
           autoComplete="email"
           maxLength={80}
@@ -77,6 +83,7 @@ export default function AdoptanteForm() {
           <FormField
             etiqueta="Dirección"
             nombre="direccion"
+            defaultValue={valorDe("direccion")}
             autoComplete="street-address"
             maxLength={100}
             placeholder="Calle 45 # 12-30, Medellín"

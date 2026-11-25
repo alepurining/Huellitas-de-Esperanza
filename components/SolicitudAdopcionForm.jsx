@@ -40,6 +40,8 @@ export default function SolicitudAdopcionForm({
 
   const errorDe = (campo) =>
     estado?.errores?.[campo] ?? (camposFaltantes.includes(campo) ? "Revisa este dato" : undefined);
+  // React 19 resetea el form al terminar la action; estos valores evitan perder lo escrito.
+  const valorDe = (campo) => estado?.valores?.[campo] ?? "";
 
   return (
     <form ref={formularioRef} action={accion} noValidate className="mt-4">
@@ -55,7 +57,7 @@ export default function SolicitudAdopcionForm({
             valor: String(mascota.id),
             etiqueta: `${mascota.nombre} · ${mascota.especie}`,
           }))}
-          defaultValue=""
+          defaultValue={valorDe("mascota_id") > 0 ? String(valorDe("mascota_id")) : ""}
           required
           error={errorDe("mascota_id")}
         />
@@ -79,6 +81,7 @@ export default function SolicitudAdopcionForm({
         <FormField
           etiqueta="Cédula"
           nombre="documento"
+          defaultValue={valorDe("documento")}
           inputMode="numeric"
           maxLength={15}
           placeholder="Solo números"
@@ -89,6 +92,7 @@ export default function SolicitudAdopcionForm({
         <FormField
           etiqueta="Nombre completo"
           nombre="nombre_completo"
+          defaultValue={valorDe("nombre_completo")}
           autoComplete="name"
           maxLength={80}
           placeholder="María Fernanda Gómez"
@@ -98,6 +102,7 @@ export default function SolicitudAdopcionForm({
         <FormField
           etiqueta="Correo"
           nombre="correo"
+          defaultValue={valorDe("correo")}
           tipo="email"
           autoComplete="email"
           maxLength={80}
@@ -108,6 +113,7 @@ export default function SolicitudAdopcionForm({
         <FormField
           etiqueta="Teléfono"
           nombre="telefono"
+          defaultValue={valorDe("telefono")}
           inputMode="numeric"
           autoComplete="tel"
           maxLength={10}
@@ -119,6 +125,7 @@ export default function SolicitudAdopcionForm({
           <FormField
             etiqueta="Dirección"
             nombre="direccion"
+            defaultValue={valorDe("direccion")}
             autoComplete="street-address"
             maxLength={100}
             placeholder="Calle 45 # 12-30, Medellín"
@@ -129,6 +136,7 @@ export default function SolicitudAdopcionForm({
         <FormField
           etiqueta="Tipo de vivienda"
           nombre="tipo_vivienda"
+          defaultValue={valorDe("tipo_vivienda")}
           tipo="select"
           placeholder="Selecciona una opción"
           opciones={[
@@ -142,6 +150,7 @@ export default function SolicitudAdopcionForm({
         <FormField
           etiqueta="Personas en el hogar"
           nombre="personas_en_hogar"
+          defaultValue={valorDe("personas_en_hogar")}
           tipo="number"
           min={1}
           max={20}
@@ -152,6 +161,7 @@ export default function SolicitudAdopcionForm({
           <FormField
             etiqueta="¿Cómo es tu vivienda?"
             nombre="descripcion_vivienda"
+            defaultValue={valorDe("descripcion_vivienda")}
             tipo="textarea"
             maxLength={1000}
             placeholder="Cuéntanos si tienes patio, balcón, rejas..."
@@ -162,7 +172,12 @@ export default function SolicitudAdopcionForm({
       </div>
 
       <label className="mt-[18px] flex items-start gap-[9px] text-[13px] font-semibold leading-[1.5] text-ink">
-        <input type="checkbox" name="animales_en_hogar" className="mt-0.5 h-4 w-4 accent-primary" />
+        <input
+          type="checkbox"
+          name="animales_en_hogar"
+          defaultChecked={estado?.valores?.animales_en_hogar === true}
+          className="mt-0.5 h-4 w-4 accent-primary"
+        />
         Ya tengo animales en casa
       </label>
 
@@ -172,6 +187,7 @@ export default function SolicitudAdopcionForm({
         <input
           type="checkbox"
           name="acepta_terminos"
+          defaultChecked={estado?.valores?.acepta_terminos === true}
           aria-invalid={errorDe("acepta_terminos") ? "true" : undefined}
           className="mt-0.5 h-4 w-4 accent-primary"
           required

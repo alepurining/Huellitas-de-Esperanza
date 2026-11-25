@@ -52,6 +52,8 @@ export default function DonacionForm({ publico = false }) {
   }, [estado]);
 
   const errorDe = (campo) => estado?.errores?.[campo];
+  // React 19 resetea el form al terminar la action; estos valores evitan perder lo escrito.
+  const valorDe = (campo) => estado?.valores?.[campo] ?? "";
 
   const elegirMontoRapido = (valor) => {
     setMonto(valor);
@@ -173,6 +175,7 @@ export default function DonacionForm({ publico = false }) {
             <FormField
               etiqueta="Descripción del insumo"
               nombre="descripcion_insumo"
+              defaultValue={valorDe("descripcion_insumo")}
               autoComplete="off"
               maxLength={300}
               placeholder="Saco de croquetas 20 kg"
@@ -182,6 +185,7 @@ export default function DonacionForm({ publico = false }) {
             <FormField
               etiqueta="Cantidad"
               nombre="cantidad"
+              defaultValue={valorDe("cantidad")}
               inputMode="numeric"
               autoComplete="off"
               maxLength={4}
@@ -195,6 +199,7 @@ export default function DonacionForm({ publico = false }) {
           <FormField
             etiqueta="Cédula registrada como adoptante"
             nombre="documento"
+            defaultValue={valorDe("documento")}
             inputMode="numeric"
             maxLength={15}
             placeholder="Solo números"
@@ -206,6 +211,7 @@ export default function DonacionForm({ publico = false }) {
             <FormField
               etiqueta="Nombre del donante"
               nombre="nombre_donante"
+              defaultValue={valorDe("nombre_donante")}
               autoComplete="name"
               maxLength={80}
               placeholder="María Fernanda Gómez"
@@ -215,6 +221,7 @@ export default function DonacionForm({ publico = false }) {
             <FormField
               etiqueta="Correo electrónico"
               nombre="correo"
+              defaultValue={valorDe("correo")}
               tipo="email"
               autoComplete="email"
               maxLength={80}

@@ -22,6 +22,8 @@ export default function MascotaForm() {
   }, [estado]);
 
   const errorDe = (campo) => estado?.errores?.[campo];
+  // React 19 resetea el form al terminar la action; estos valores evitan perder lo escrito.
+  const valorDe = (campo) => estado?.valores?.[campo] ?? "";
 
   return (
     <form ref={formularioRef} action={accion} noValidate>
@@ -39,6 +41,7 @@ export default function MascotaForm() {
         <FormField
           etiqueta="Nombre"
           nombre="nombre"
+          defaultValue={valorDe("nombre")}
           autoComplete="off"
           maxLength={50}
           placeholder="Bruno"
@@ -48,6 +51,7 @@ export default function MascotaForm() {
         <FormField
           etiqueta="Raza"
           nombre="raza"
+          defaultValue={valorDe("raza")}
           autoComplete="off"
           maxLength={50}
           placeholder="Labrador mestizo"
@@ -57,6 +61,7 @@ export default function MascotaForm() {
         <FormField
           etiqueta="Edad estimada"
           nombre="edad_estimada"
+          defaultValue={valorDe("edad_estimada")}
           autoComplete="off"
           maxLength={30}
           placeholder="2 años"
@@ -67,6 +72,7 @@ export default function MascotaForm() {
         <FormField
           etiqueta="Especie"
           nombre="especie"
+          defaultValue={valorDe("especie")}
           tipo="select"
           opciones={opcionesDe("Selecciona la especie", [
             { valor: "perro", etiqueta: "Perro" },
@@ -78,6 +84,7 @@ export default function MascotaForm() {
         <FormField
           etiqueta="Sexo"
           nombre="sexo"
+          defaultValue={valorDe("sexo")}
           tipo="select"
           opciones={opcionesDe("Sin registrar", [
             { valor: "macho", etiqueta: "Macho" },
@@ -88,6 +95,7 @@ export default function MascotaForm() {
         <FormField
           etiqueta="Tamaño"
           nombre="tamano"
+          defaultValue={valorDe("tamano")}
           tipo="select"
           opciones={opcionesDe("Sin registrar", [
             { valor: "pequeño", etiqueta: "Pequeño" },
@@ -99,6 +107,7 @@ export default function MascotaForm() {
         <FormField
           etiqueta="Estado"
           nombre="estado"
+          defaultValue={valorDe("estado")}
           tipo="select"
           opciones={opcionesDe("Selecciona el estado", [
             { valor: "en_adopcion", etiqueta: "Disponible" },
@@ -111,6 +120,7 @@ export default function MascotaForm() {
           <FormField
             etiqueta="Foto (URL)"
             nombre="foto_url"
+            defaultValue={valorDe("foto_url")}
             tipo="url"
             autoComplete="off"
             maxLength={255}
@@ -136,6 +146,7 @@ export default function MascotaForm() {
           <FormField
             etiqueta="Personalidad"
             nombre="personalidad"
+            defaultValue={valorDe("personalidad")}
             tipo="textarea"
             filas={3}
             maxLength={500}
@@ -148,6 +159,7 @@ export default function MascotaForm() {
           <FormField
             etiqueta="Resumen de salud"
             nombre="salud_resumen"
+            defaultValue={valorDe("salud_resumen")}
             tipo="textarea"
             filas={2}
             maxLength={300}
