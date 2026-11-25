@@ -37,3 +37,15 @@ Thumbs.db
 # Configuración personal del editor
 .vscode/*
 !.vscode/settings.json
+
+
+
+#kilo
+node_modules
+package.json
+package-lock.json
+pnpm-lock.yaml
+bun.lock
+yarn.lock
+.gitignore
+agent-manager.json
