@@ -77,8 +77,8 @@ dialoga. Si algo de diseño no está en `STYLEGUIDE.md`, se propone allí primer
 
 - El panel privado (`/admin/*`) **requiere login JWT** con rol `administrador` | `veterinario` | `voluntario`.
 - Adoptantes y donantes **nunca tienen login**: sus formularios son públicos.
-- **Estados de la mascota (únicos del Sprint 1):** `en_adopcion` (etiqueta visible **"Busco hogar"**) y `adoptado`.
-  No se usan "disponible" ni "reservado".
+- **Estados de la mascota (únicos del Sprint 1):** `en_adopcion` (etiqueta visible **"Disponible"**) y `adoptado`.
+  "Disponible" es una etiqueta de interfaz; el valor guardado sigue siendo `en_adopcion`. No se usa "reservado".
 - **No** hay historial médico (US 1.5 = Won't Have): la salud es un solo campo `salud_resumen`.
 - **No** hay gestión de voluntariado ni módulo de salud veterinaria: no existen en Confluence.
 - El MVP es **concepto/demo**: sin pasarela de pago real, sin correos reales, cifras/fotos/contactos de muestra
@@ -200,7 +200,7 @@ avanzados, correos y PDF.
      `ErrorBanner` (`CircleAlert` + "Reintentar").
   7. `Pagination` (páginas circulares) cuando hay más de 12 resultados.
   8. `Footer`.
-- **`PetCard` variante A** (fichas de 302px): imagen 260px + `PetStatusBadge` "Busco hogar" flotante;
+- **`PetCard` variante A** (fichas de 302px): imagen 260px + `PetStatusBadge` "Disponible" flotante;
   cuerpo con nombre (Fraunces 30px) + icono de especie (`dog`/`cat`), meta (raza · edad · sexo),
   tamaño, personalidad, línea de salud, separador y CTA de texto "Conocer a {nombre}" + `arrow-up-right`.
 - **Componentes e Interacciones:** `Chip` filtran por `especie` y actualizan la query URL;
@@ -222,7 +222,7 @@ avanzados, correos y PDF.
   3. **Retrato** grande (`--radius-feature` 140/20/20/20) con `PetStatusBadge` sobre la foto y `alt`
      descriptivo ("Bruno, perro en adopción").
   4. **Panel de identidad:** nombre (Fraunces), icono de especie, meta (raza · edad · sexo · tamaño),
-     badge de estado (`en_adopcion` → "Busco hogar"), personalidad.
+     badge de estado (`en_adopcion` → "Disponible"), personalidad.
   5. **Bloque "Salud"**: resumen (`salud_resumen`: vacunas/desparasitación) — sin historial clínico.
   6. **Cita/descripción corta** + bloque de disponibilidad.
   7. CTA principal: `PrimaryButton` "Quiero conocer a {nombre}" → abre `AdoptionModal`;

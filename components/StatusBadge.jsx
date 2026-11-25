@@ -1,6 +1,6 @@
 // Badges de STYLEGUIDE.md. La clave puede ser el `estado` del modelo o una variante explícita.
 const variantes = {
-  // Disponibilidad de mascota: píldora rosa "Busco hogar"
+  // Disponibilidad de mascota: píldora rosa "Disponible"
   en_adopcion: "rounded-pill bg-primary-50 px-3 py-[7px] text-[#b74581]",
   adoptado: "rounded-[10px] bg-success-50 px-2.5 py-1.5 text-success-700",
   // Estados de fila
@@ -19,7 +19,7 @@ const variantes = {
 };
 
 const etiquetas = {
-  en_adopcion: "Busco hogar",
+  en_adopcion: "Disponible",
   adoptado: "Adoptado",
   activo: "Activo",
   inactivo: "Inactivo",

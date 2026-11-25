@@ -78,7 +78,7 @@ export default async function AdminMascotasPage({ searchParams }) {
             Todas
           </Chip>
           <Chip href="/admin/mascotas?estado=en_adopcion" activo={filtroEstado === "en_adopcion"}>
-            En adopción
+            Disponible
           </Chip>
           <Chip href="/admin/mascotas?estado=adoptado" activo={filtroEstado === "adoptado"}>
             Adoptado

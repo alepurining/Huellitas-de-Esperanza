@@ -101,7 +101,7 @@ export default function MascotaForm() {
           nombre="estado"
           tipo="select"
           opciones={opcionesDe("Selecciona el estado", [
-            { valor: "en_adopcion", etiqueta: "En adopción" },
+            { valor: "en_adopcion", etiqueta: "Disponible" },
             { valor: "adoptado", etiqueta: "Adoptado" },
           ])}
           required

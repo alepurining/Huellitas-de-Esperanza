@@ -275,16 +275,16 @@ Sistema base: **refugio2**. Los verdes/terracota de refugio1 se conservan sólo 
 
 | Tipo | Fondo | Texto | Radio | Padding | Tamaño |
 |---|---|---|---|---|---|
-| Disponibilidad ("Busco hogar" = `en_adopcion`) | `#fce7f3` | `#b74581` | 100px | 7px 12px | 11px/700 |
+| Disponibilidad ("Disponible" = `en_adopcion`) | `#fce7f3` | `#b74581` | 100px | 7px 12px | 11px/700 |
 | Estado de fila (pendiente) | `#fff2dc` | `#8a5a22` | 10px | 6px 10px | 11px/700 |
 | Estado aprobado | `#d9f8e9` | `#2f6d55` | 10px | 6px 10px | 11px/700 |
 | Neutro / borrador | `#f3f4f6` | `#4b5563` | 10px | 6px 10px | 11px/700 |
 | Info | `#eff6ff` | `#416589` | 10px | 6px 10px | 11px/700 |
 | Etiqueta sobre foto (`pet-status`) | `#fdba74` | `#74471d` | 12px | 6px 11px | 11px/800 |
 
-> **Vocabulario de estados:** el badge **"Busco hogar"** corresponde al estado `en_adopcion` del modelo.
-> Los únicos estados del Sprint 1 son **`en_adopcion`** y **`adoptado`**: no se usan "disponible" ni
-> "reservado".
+> **Vocabulario de estados:** el badge **"Disponible"** corresponde al estado `en_adopcion` del modelo.
+> Los únicos estados del Sprint 1 son **`en_adopcion`** y **`adoptado`**; "Disponible" es solo su etiqueta
+> visible y no cambia el valor almacenado.
 
 ### Tarjeta de mascota (público)
 

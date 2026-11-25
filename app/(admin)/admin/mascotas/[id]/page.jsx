@@ -10,7 +10,7 @@ export const metadata = { title: "Ficha de mascota" };
 const sexos = { macho: "Macho", hembra: "Hembra" };
 const tamanos = { pequeño: "Pequeño", mediano: "Mediano", grande: "Grande" };
 const especies = { perro: "Perro", gato: "Gato" };
-const estados = { en_adopcion: "En adopción", adoptado: "Adoptado" };
+const estados = { en_adopcion: "Disponible", adoptado: "Adoptado" };
 
 const fecha = new Intl.DateTimeFormat("es-CO", { dateStyle: "short" });
 
