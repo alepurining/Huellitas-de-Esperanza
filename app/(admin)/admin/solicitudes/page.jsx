@@ -5,19 +5,42 @@ import DashPanel from "@/components/DashPanel";
 import PanelHeading from "@/components/PanelHeading";
 import StatusBadge from "@/components/StatusBadge";
 import EmptyState from "@/components/EmptyState";
+import Chip from "@/components/Chip";
 
 export const metadata = { title: "Solicitudes de adopción" };
 
 const fecha = new Intl.DateTimeFormat("es-CO", { dateStyle: "short" });
 
-export default async function AdminSolicitudesPage() {
-  const solicitudes = await prisma.solicitudAdopcion.findMany({
+const VISTAS = [
+  { clave: "pendientes", etiqueta: "Pendientes", tono: "oscuro" },
+  { clave: "resueltas", etiqueta: "Resueltas", tono: "rosa" },
+];
+
+export default async function AdminSolicitudesPage({ searchParams }) {
+  const { vista } = await searchParams;
+  const filtro = vista === "resueltas" ? "resueltas" : "pendientes";
+
+  const todas = await prisma.solicitudAdopcion.findMany({
     include: {
       adoptante: { select: { nombre_completo: true, documento: true } },
       mascota: { select: { nombre: true } },
     },
     orderBy: { fecha_solicitud: "desc" },
   });
+  const pendientes = todas.filter((s) => s.estado === "en_revision");
+  const resueltas = todas.filter((s) => s.estado !== "en_revision");
+  const visibles = filtro === "pendientes" ? pendientes : resueltas;
+  const conteos = { pendientes: pendientes.length, resueltas: resueltas.length };
+  const vacio =
+    filtro === "pendientes"
+      ? {
+          titulo: "No hay solicitudes pendientes",
+          texto: "Las solicitudes enviadas desde el sitio público aparecerán aquí para su revisión.",
+        }
+      : {
+          titulo: "Todavía no hay solicitudes resueltas",
+          texto: "Las solicitudes aprobadas o rechazadas se guardarán aquí como historial.",
+        };
 
   return (
     <>
@@ -26,26 +49,45 @@ export default async function AdminSolicitudesPage() {
           Solicitudes de adopción
         </h1>
         <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
-          {solicitudes.length} {solicitudes.length === 1 ? "solicitud registrada" : "solicitudes registradas"}
+          {pendientes.length}{" "}
+          {pendientes.length === 1 ? "solicitud pendiente" : "solicitudes pendientes"} ·{" "}
+          {resueltas.length} {resueltas.length === 1 ? "resuelta" : "resueltas"}
         </p>
       </header>
 
       <DashPanel>
         <PanelHeading
           titulo="Bandeja de solicitudes"
-          subtitulo="Abre cada solicitud para revisar los datos del adoptante y su hogar."
+          subtitulo={
+            filtro === "pendientes"
+              ? "Abre cada solicitud para revisar los datos del adoptante y su hogar."
+              : "Historial de las decisiones ya tomadas sobre las solicitudes."
+          }
         />
 
-        {solicitudes.length === 0 ? (
-          <EmptyState
-            icono={ClipboardList}
-            titulo="Todavía no hay solicitudes"
-            texto="Las solicitudes enviadas desde el sitio aparecerán aquí."
-          />
+        <nav aria-label="Filtrar solicitudes" className="mb-4 flex flex-wrap gap-2">
+          {VISTAS.map((opcion) => (
+            <Chip
+              key={opcion.clave}
+              href={`/admin/solicitudes?vista=${opcion.clave}`}
+              activo={filtro === opcion.clave}
+              tono={opcion.tono}
+            >
+              {opcion.etiqueta} ({conteos[opcion.clave]})
+            </Chip>
+          ))}
+        </nav>
+
+        {visibles.length === 0 ? (
+          <EmptyState icono={ClipboardList} titulo={vacio.titulo} texto={vacio.texto} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[700px] border-collapse text-left">
-              <caption className="sr-only">Solicitudes de adopción recibidas</caption>
+              <caption className="sr-only">
+                {filtro === "pendientes"
+                  ? "Solicitudes de adopción pendientes de revisión"
+                  : "Solicitudes de adopción resueltas"}
+              </caption>
               <thead>
                 <tr className="text-[11px] font-bold uppercase tracking-[1.7px] text-ink-500">
                   <th scope="col" className="py-2">Adoptante</th>
@@ -56,7 +98,7 @@ export default async function AdminSolicitudesPage() {
                 </tr>
               </thead>
               <tbody>
-                {solicitudes.map((solicitud) => (
+                {visibles.map((solicitud) => (
                   <tr key={solicitud.id} className="border-t border-[#f1edef]">
                     <td className="py-3">
                       <p className="text-[14px] font-extrabold text-ink">

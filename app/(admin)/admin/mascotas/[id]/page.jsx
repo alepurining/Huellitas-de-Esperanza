@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, PawPrint, Pencil, Sparkles, Stethoscope } from "lucide-react";
+import { ArrowLeft, PawPrint, Pencil, Sparkles, Stethoscope, UserRound } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { mensajes } from "@/lib/mensajes";
 import DashPanel from "@/components/DashPanel";
@@ -32,7 +33,16 @@ export default async function FichaStaffPage({ params, searchParams }) {
   const numero = Number(id);
   if (!Number.isInteger(numero)) notFound();
 
-  const mascota = await prisma.mascota.findUnique({ where: { id: numero } });
+  const [mascota, adopcion] = await Promise.all([
+    prisma.mascota.findUnique({ where: { id: numero } }),
+    prisma.solicitudAdopcion.findFirst({
+      where: { mascota_id: numero, estado: "aprobada" },
+      include: {
+        adoptante: { select: { id: true, nombre_completo: true, documento: true } },
+      },
+      orderBy: { fecha_solicitud: "desc" },
+    }),
+  ]);
   if (!mascota) notFound();
 
   return (
@@ -89,6 +99,35 @@ export default async function FichaStaffPage({ params, searchParams }) {
               <Dato etiqueta="Estado" valor={estados[mascota.estado] ?? mascota.estado} />
             </div>
           </DashPanel>
+
+          {mascota.estado === "adoptado" ? (
+            <DashPanel>
+              <h2 className="flex items-center gap-2 font-display text-2xl leading-[1.2] text-ink">
+                <UserRound size={20} strokeWidth={2} aria-hidden="true" />
+                Adoptado por
+              </h2>
+              {adopcion ? (
+                <div className="mt-4">
+                  <p className="text-[15px] font-extrabold text-ink">
+                    {adopcion.adoptante.nombre_completo}
+                  </p>
+                  <p className="mt-1 text-[13px] text-ink-500">
+                    Cédula {adopcion.adoptante.documento}
+                  </p>
+                  <Link
+                    href={`/admin/adoptantes/${adopcion.adoptante.id}/editar`}
+                    className="mt-3 inline-block text-[13px] font-extrabold text-primary-600 underline-offset-2 hover:underline"
+                  >
+                    Ver perfil del adoptante
+                  </Link>
+                </div>
+              ) : (
+                <p className="mt-3 text-[14px] leading-[1.7] text-ink-500">
+                  Esta mascota se marcó como adoptada manualmente y no tiene adoptante vinculado.
+                </p>
+              )}
+            </DashPanel>
+          ) : null}
 
           <DashPanel>
             <h2 className="flex items-center gap-2 font-display text-2xl leading-[1.2] text-ink">

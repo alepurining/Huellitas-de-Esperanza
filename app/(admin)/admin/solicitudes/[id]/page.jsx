@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, House, PawPrint, UserRound, MessageCircle } from "lucide-react";
+import { AlertCircle, ArrowLeft, House, PawPrint, UserRound, MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { mensajes } from "@/lib/mensajes";
 import DashPanel from "@/components/DashPanel";
@@ -32,17 +32,21 @@ export default async function AdminSolicitudDetallePage({ params, searchParams }
     where: { id: numero },
     include: {
       adoptante: true,
-      mascota: { select: { id: true, nombre: true, especie: true, raza: true } },
+      mascota: { select: { id: true, nombre: true, especie: true, raza: true, estado: true } },
     },
   });
   if (!solicitud) notFound();
 
-  const toastMensaje =
+  const baseToast =
     sp.actualizada === "1"
       ? sp.mensajeEnviado === "1"
         ? mensajes.mensajeEnviadoAdoptante
         : mensajes.solicitudActualizada
       : null;
+  const toastMensaje =
+    baseToast && Number(sp.rechazadas) > 0
+      ? `${baseToast} ${mensajes.solicitudesRechazadasPorAdopcion}`
+      : baseToast;
 
   return (
     <div className="mx-auto max-w-[980px]">
@@ -90,6 +94,12 @@ export default async function AdminSolicitudDetallePage({ params, searchParams }
           <p className="mt-1 text-sm text-ink-500">
             {solicitud.mascota.especie} · {solicitud.mascota.raza}
           </p>
+          {solicitud.mascota.estado === "adoptado" && solicitud.estado !== "aprobada" ? (
+            <p className="mt-3 flex items-start gap-2 rounded-lg border border-border bg-warning-50 px-3 py-2 text-xs font-medium text-warning-700">
+              <AlertCircle size={14} aria-hidden="true" className="mt-0.5 shrink-0" />
+              Esta mascota ya fue adoptada en otra solicitud. Solo puedes rechazar esta.
+            </p>
+          ) : null}
           <Link
             href={`/admin/mascotas/${solicitud.mascota.id}`}
             className="mt-3 inline-block text-[13px] font-extrabold text-primary-600 underline-offset-2 hover:underline"

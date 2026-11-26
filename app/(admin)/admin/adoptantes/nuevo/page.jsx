@@ -1,4 +1,5 @@
 import { UserPlus } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 import AdoptanteForm from "@/components/AdoptanteForm";
 import DashPanel from "@/components/DashPanel";
 import GhostButton from "@/components/GhostButton";
@@ -6,7 +7,13 @@ import PanelHeading from "@/components/PanelHeading";
 
 export const metadata = { title: "Nuevo adoptante" };
 
-export default function NuevoAdoptantePage() {
+export default async function NuevoAdoptantePage() {
+  const mascotas = await prisma.mascota.findMany({
+    where: { estado: "en_adopcion" },
+    select: { id: true, nombre: true, especie: true, raza: true },
+    orderBy: { nombre: "asc" },
+  });
+
   return (
     <>
       <header className="mb-6">
@@ -16,7 +23,8 @@ export default function NuevoAdoptantePage() {
             Nuevo adoptante
           </h1>
           <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
-            Registra los datos de contacto de una persona interesada en adoptar
+            Registra los datos de contacto y, si lo deseas, selecciona una mascota para iniciar
+            su solicitud de adopción.
           </p>
         </div>
       </header>
@@ -28,7 +36,7 @@ export default function NuevoAdoptantePage() {
         >
           <UserPlus size={20} strokeWidth={2} aria-hidden="true" className="text-primary-600" />
         </PanelHeading>
-        <AdoptanteForm />
+        <AdoptanteForm mascotas={mascotas} />
       </DashPanel>
     </>
   );

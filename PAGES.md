@@ -104,7 +104,7 @@ dialoga. Si algo de diseño no está en `STYLEGUIDE.md`, se propone allí primer
 | US 3.1 | Generar un informe en PDF de las donaciones. | Should | 2 |
 | US 4.3 | Cambiar el estado de las solicitudes de adopción (en revisión, aprobada, rechazada). | Should | 2 |
 | US 1.4 | Filtrar la visualización de los animales por su información (adoptante). | Could | 2 |
-| US 2.4 | Visualizar qué animales ha adoptado un adoptante concreto. | Could | 2 |
+| US 2.4 | Visualizar qué animales ha adoptado un adoptante concreto (**implementado** en Sprint 2). | Could | 2 |
 | US 3.4 | Recibir un comprobante o confirmación de la donación (donante). | Should | 2 |
 | US 3.5 | Consultar y filtrar el historial de donaciones por tipo o fecha. | Could | 2 |
 | US 1.5 | Historiales clínicos en PDF. | Would | 2 |
@@ -130,8 +130,8 @@ dialoga. Si algo de diseño no está en `STYLEGUIDE.md`, se propone allí primer
 | 6 | `/admin/mascotas` | Listado de fichas de animales (US 1.2 · ESC-1.2.1) | **MVP** | **refugio2** (tabla) |
 | 7 | `/admin/mascotas/nueva` | Registro de ficha de animal (US 1.1) | **MVP** | **refugio2** (formularios) |
 | 8 | `/admin/mascotas/[id]` | Ficha detallada del animal (staff, solo lectura) | Soporte (US 1.2) | **integración** refugio1 + refugio2 |
-| 9 | `/admin/adoptantes` | Listado + búsqueda por cédula (US 2.2) | **MVP** | **refugio2** |
-| 10 | `/admin/adoptantes/nuevo` | Registro de adoptante (US 2.1) | **MVP** | **refugio2** (formularios) |
+| 9 | `/admin/adoptantes` | Listado + búsqueda por cédula (US 2.2) y situación de adopción (US 2.4) | **MVP** + Sprint 2 | **refugio2** |
+| 10 | `/admin/adoptantes/nuevo` | Registro de adoptante (US 2.1) con mascota opcional (US 2.4) | **MVP** + Sprint 2 | **refugio2** (formularios) |
 | 11 | `/admin/donaciones` | Registro y consulta de donaciones (US 3.3) | **MVP** | **refugio2** (tabla + formulario) |
 | 12 | *(transversal)* | `Toast`, `Spinner`, `EmptyState`, `ErrorBanner` | Soporte | **refugio2** |
 | 13 | *(modal opcional)* | `AdoptionModal` — acceso rápido al mismo formulario desde la ficha | **MVP** | **refugio2** |
@@ -338,8 +338,10 @@ avanzados, correos.
 - **Origen de Diseño:** **integración** — contenido completo de la ficha (estilo editorial refugio1)
   dentro del patrón `DashPanel` de refugio2.
 - **Secciones y Bloques:** `Sidebar` + header con nombre y `StatusBadge`; `DashPanel` con foto +
-  datos generales (raza, edad, especie, sexo, tamaño, estado), bloque personalidad, bloque salud
-  resumen, metadatos (id, fecha de registro, `foto_url`); `GhostButton` "← Volver al listado".
+  datos generales (raza, edad, especie, sexo, tamaño, estado), bloque **"Adoptado por"** cuando la
+  mascota está adoptada (nombre, cédula y enlace al perfil del adoptante; aviso si no hay vínculo),
+  bloque personalidad, bloque salud resumen, metadatos (id, fecha de registro, `foto_url`);
+  `GhostButton` "← Volver al listado".
 - **Interacciones:** solo lectura. Sin "Editar" ni "Eliminar" (Sprint 2).
 - **Datos y Backend:** `GET /api/mascotas/:id` (staff completo). **Sin** historial clínico:
   `salud_resumen` es un solo campo.
@@ -353,31 +355,55 @@ avanzados, correos.
   1. `Sidebar` + header ("Adoptantes").
   2. `PanelHeading` + **`PrimaryButton` "Nuevo adoptante"** → `/admin/adoptantes/nuevo`.
   3. Barra de búsqueda destacada: `Input` con icono `Search` **"Buscar por número de cédula…"** (ESC-2.2.2).
-  4. **`DataTable`**: Nombre · Documento (cédula) · Teléfono · Dirección · `StatusBadge` ("Activo").
-  5. Estados: `Spinner`, `EmptyState`, `ErrorBanner`; contador de resultados.
+  4. **Chips de situación (US 2.4):** "Todos", "Adoptantes", "Postulados" y "Donantes", con contador
+     y filtro por `?vista=adoptantes|postulados|donantes`; la búsqueda por cédula se conserva al
+     cambiar de chip.
+  5. **`DataTable`**: Nombre · Documento (cédula) · Situación (`StatusBadge`: Adoptante / Postulado /
+     Donante / Sin actividad; badge secundario "Donante" si la persona aportó y además adoptó o
+     postuló) · Mascota(s) (enlace a la ficha + badge Adoptado/En revisión) · Teléfono · Dirección ·
+     Acciones.
+  6. Estados: `Spinner`, `EmptyState` con orientación distinta por pestaña, `ErrorBanner`; contador.
 - **Componentes e Interacciones:** búsqueda por cédula (Enter o botón) → filtra en vivo. Sin modal de
-  detalle (Sprint 2); la información completa se ve en la fila/tabla.
-- **Datos y Backend:** `GET /api/adoptantes?q={cedula}&pagina=` (coincidencia por `documento`).
-  Estados del adoptante: `activo` (por defecto) / `inactivo` — el alta inicial siempre es "Activo"
-  (ESC-2.1.1).
+  detalle (Sprint 2); la información completa se ve en la fila/tabla. La situación principal es
+  **excluyente** y sigue la prioridad: "Adoptante" (≥1 solicitud aprobada) → "Postulado" (≥1 en
+  revisión y ninguna aprobada) → "Donante" (≥1 donación vinculada y ninguna adopción/postulación
+  activa) → "Sin actividad". "Donantes" se filtra aparte por tener donaciones y **puede solaparse**
+  con "Adoptantes"/"Postulados": donar es independiente de adoptar. La fila muestra todas sus
+  mascotas aunque pertenezca a otra pestaña.
+- **Datos y Backend:** Prisma directo, `adoptante` con `include: solicitudes → mascota` y
+  `donaciones`; coincidencia por `documento` para la búsqueda. La situación **se deriva** de
+  `solicitud_adopcion.estado` y de la existencia de donaciones vinculadas: no se guarda un campo
+  nuevo. Solo se etiqueta como donante al aporte con `adoptante_id`; los aportes de staff con nombre
+  libre siguen únicamente en `/admin/donaciones`. `adoptante.estado` sigue siendo `activo` (alta
+  inicial) / `inactivo` y ya no se muestra como si fuera estado de adopción.
 
 ### 10. `/admin/adoptantes/nuevo` — Registro de adoptante (US 2.1)
 
-- **Propósito:** Registrar a un adoptante (presencial o telefónico) en la base de datos.
-  Cumple **US 2.1** (ESC-2.1.1 alta exitosa; ESC-2.1.2 control de duplicados por cédula).
+- **Propósito:** Registrar a un adoptante (presencial o telefónico) en la base de datos y,
+  opcionalmente, seleccionar una mascota disponible para iniciar su solicitud de adopción.
+  Cumple **US 2.1** (ESC-2.1.1 alta exitosa; ESC-2.1.2 control de duplicados por cédula) y apoya
+  **US 2.4** al permitir vincular la mascota desde el alta.
 - **Origen de Diseño:** **refugio2** (formularios 2 columnas).
 - **Secciones y Bloques:** `Sidebar` + header ("Nuevo adoptante" + `GhostButton` "← Volver");
   `DashPanel` con form en 2 columnas:
   - `documento*` (**cédula**, texto con hint "solo números"), `nombre_completo*`, `telefono*`,
     `direccion*`, `correo` (opcional).
+  - `mascota_id` (opcional): selector de mascotas **en adopción** ("Ninguna — solo registrar los
+    datos"), con helper que explica que se creará una solicitud en revisión.
   - `PrimaryButton` "Registrar Adoptante" + `OutlineButton` "Cancelar" → `/admin/adoptantes`.
-- **Interacciones:** validación de obligatorios (estilo rojo + foco); **ESC-2.1.2**: si la cédula ya
-  existe, la acción muestra bajo `documento` el texto exacto *"El número de documento ya se
-  encuentra registrado"*; ESC-2.1.1 → `Toast` "Adoptante registrado" y redirect a
-  `/admin/adoptantes`, mostrando el perfil creado con ID única y estado "Activo".
+- **Interacciones:** validación de obligatorios y del select (estilo rojo + foco); **ESC-2.1.2**: si
+  la cédula ya existe, la acción muestra bajo `documento` el texto exacto *"El número de documento ya
+  se encuentra registrado"*; ESC-2.1.1 → `Toast` "Adoptante registrado" (o "Adoptante registrado con
+  una solicitud en revisión" si se eligió mascota) y redirect a `/admin/adoptantes`, mostrando el
+  perfil creado con ID única y estado "Activo". El botón se deshabilita y muestra "Registrando…"
+  mientras la petición está en curso.
 - **Datos y Backend:** Server Action `crearAdoptante` con
-  `{ documento, nombre_completo, telefono, direccion, correo }` → crea el registro con
-  `estado = "activo"`; el backend valida **unicidad de `documento`** (índice único en Prisma).
+  `{ documento, nombre_completo, telefono, direccion, correo, mascota_id }` → en una transacción crea
+  el adoptante con `estado = "activo"` y, si hay mascota elegida, crea una
+  `solicitud_adopcion` con **`estado = "en_revision"`** (sin tocar el estado de la mascota ni
+  rechazar otras solicitudes). La aprobación posterior se hace desde `/admin/solicitudes/[id]`, que
+  sí sincroniza la mascota y cierra las pendientes. El backend valida **unicidad de `documento`**
+  (índice único en Prisma) y que la mascota siga disponible.
 
 ### 11. `/admin/donaciones` — Registro y consulta de donaciones (US 3.3)
 
@@ -419,19 +445,28 @@ avanzados, correos.
 
 ### 13. `/admin/solicitudes` — Revisión de solicitudes (Sprint 2)
 
-- **Bandeja:** lista todas las solicitudes, más recientes primero, mostrando adoptante, cédula, mascota,
-  fecha y estado. Cada fila enlaza al detalle.
+- **Bandeja:** por defecto muestra **solo las solicitudes `en_revision`** (pendientes), más recientes
+  primero, con adoptante, cédula, mascota, fecha y estado. Cada fila enlaza al detalle. Al aprobar o
+  rechazar, la solicitud sale de esta vista. El chip **"Resueltas"** (`?vista=resueltas`) muestra el
+  historial de aprobadas/rechazadas para poder consultar o revertir una decisión; ambas vistas tienen
+  contador y `EmptyState` propio.
 - **Detalle:** presenta la información de contacto del adoptante, la ficha de la mascota y las
   condiciones del hogar indicadas en la solicitud.
 - **Decisión:** personal autenticado puede cambiar el estado a `en_revision`, `aprobada` o `rechazada`.
-  La decisión se guarda en `solicitud_adopcion.estado`.
+  La decisión se guarda en `solicitud_adopcion.estado`. Al **aprobar**, en la misma transacción la
+  mascota pasa a `adoptado` (y desaparece del catálogo público) y se rechazan automáticamente las
+  demás solicitudes `en_revision` de esa mascota; el toast lo comunica. Si la mascota ya tiene otra
+  solicitud aprobada, la aprobación se bloquea con un error accionable. Al revertir una aprobación,
+  la mascota vuelve a `en_adopcion` si no queda otra solicitud aprobada. US 2.5 añade el mensaje
+  opcional al adoptante (correo simulado por `console.log`).
 
 ### 14. Transversales — `Toast` y estados
 
 - **`Toast`:** único patrón de éxito/error global (inferior centrado, `#374151`, icono `CircleCheck`
-  mint, 3500ms). Textos en español: "Ficha guardada con éxito", "Ficha actualizada con éxito", "Adoptante registrado", "Adoptante actualizado con éxito",
+  mint, 3500ms). Textos en español: "Ficha guardada con éxito", "Ficha actualizada con éxito", "Adoptante registrado", "Adoptante registrado con una solicitud en revisión", "Adoptante actualizado con éxito",
   "Aporte registrado", "¡Gracias por tu aporte! El refugio coordinará contigo la entrega.",
-  "¡Solicitud enviada! Te contactaremos pronto.".
+  "¡Solicitud enviada! Te contactaremos pronto.", "Se rechazaron automáticamente las solicitudes
+  pendientes de esta mascota.".
 - **Estados globales (de `STYLEGUIDE.md`):** `Spinner` (`Loader2`), `EmptyState` (icono + H3 Fraunces + CTA),
   `ErrorBanner` (`CircleAlert` + "Reintentar"), bloque Info (azul) para avisos de demo y banda
   "modo demo" en las páginas públicas.
@@ -464,7 +499,7 @@ avanzados, correos.
 | `/admin/dashboard` | Pantalla de apoyo sin historia Must; tras el login se va a `/admin/mascotas`. |
 | `/admin/solicitudes` (bandeja y cambio de estado) | Implementado: revisión del detalle y cambio de estado (US 4.3, Sprint 2). |
 | Edición y borrado de fichas (`ConfirmDangerModal`) | US 1.3 (Should) y permisos finos. |
-| `AdoptanteDetailModal` | US 2.4 (Could). |
+| `AdoptanteDetailModal` | US 2.4 (Could) resuelta sin modal: columna de mascotas y chips de situación en `/admin/adoptantes`, más el bloque "Adoptado por" en la ficha de la mascota. |
 | `DonationModal` | Con el formulario en panel de `/admin/donaciones` la US 3.3 ya se cumple. |
 | Filtros avanzados, historial de donaciones, PDF, comprobantes | US 1.4, 3.1, 3.4, 3.5 (Could/Should). |
 | Correos o mensajes al adoptante | US 2.5 (Should, **implementado** en Sprint 2: confirmación de decisión + mensaje con simulación de correo) y US 4.2 (Would). |

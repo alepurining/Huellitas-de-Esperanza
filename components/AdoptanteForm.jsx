@@ -4,7 +4,7 @@ import { useActionState, useEffect, useRef, useState, useTransition } from "reac
 import { CircleAlert, Loader2 } from "lucide-react";
 import { crearAdoptante } from "@/lib/actions/adoptantes";
 import {
-  esquemaAdoptante,
+  esquemaAltaAdoptante,
   esquemaActualizarAdoptante,
   erroresDe,
 } from "@/lib/validaciones";
@@ -20,6 +20,7 @@ function extraerDatosFormulario(formData, incluirEstado) {
     telefono: String(formData.get("telefono") ?? "").trim(),
     direccion: String(formData.get("direccion") ?? "").trim(),
     correo: String(formData.get("correo") ?? "").trim(),
+    mascota_id: String(formData.get("mascota_id") ?? "").trim(),
   };
 
   if (incluirEstado) {
@@ -34,6 +35,7 @@ export default function AdoptanteForm({
   accionServidor = crearAdoptante,
   hrefCancelar = "/admin/adoptantes",
   textoBoton = "Registrar Adoptante",
+  mascotas = [],
 }) {
   const esEdicion = Boolean(adoptanteInicial?.id);
   const [estado, accion, enviando] = useActionState(accionServidor, null);
@@ -56,6 +58,19 @@ export default function AdoptanteForm({
   // React 19 resetea el form al terminar la action; estos valores conservan lo escrito o lo cargado.
   const valorDe = (campo) => estado?.valores?.[campo] ?? adoptanteInicial?.[campo] ?? "";
 
+  const opcionesMascotas = mascotas.map((mascota) => ({
+    valor: mascota.id,
+    etiqueta: `${mascota.nombre} · ${mascota.especie}${mascota.raza ? ` · ${mascota.raza}` : ""}`,
+  }));
+  // Si la mascota ya no está disponible, conservamos la opción para que el error sea visible.
+  const idMascota = String(valorDe("mascota_id") ?? "");
+  if (idMascota && !opcionesMascotas.some((opcion) => String(opcion.valor) === idMascota)) {
+    opcionesMascotas.unshift({
+      valor: idMascota,
+      etiqueta: `Mascota #${idMascota} (ya no disponible)`,
+    });
+  }
+
   const manejarEnvio = (evento) => {
     if (estaEnviando) {
       evento.preventDefault();
@@ -64,7 +79,7 @@ export default function AdoptanteForm({
 
     const formData = new FormData(evento.currentTarget);
     const datos = extraerDatosFormulario(formData, esEdicion);
-    const esquema = esEdicion ? esquemaActualizarAdoptante : esquemaAdoptante;
+    const esquema = esEdicion ? esquemaActualizarAdoptante : esquemaAltaAdoptante;
     const resultado = esquema.safeParse(datos);
 
     if (!resultado.success) {
@@ -173,6 +188,20 @@ export default function AdoptanteForm({
               error={errorDe("direccion")}
             />
           </div>
+          {!esEdicion ? (
+            <div className="md:col-span-2">
+              <FormField
+                etiqueta="Mascota (opcional)"
+                nombre="mascota_id"
+                tipo="select"
+                defaultValue={idMascota}
+                placeholder="Ninguna — solo registrar los datos"
+                opciones={opcionesMascotas}
+                ayuda="Opcional. Si eliges una mascota disponible, se creará una solicitud en revisión; podrás aprobarla después desde la bandeja de solicitudes."
+                error={errorDe("mascota_id")}
+              />
+            </div>
+          ) : null}
           {esEdicion ? (
             <FormField
               etiqueta="Estado"
