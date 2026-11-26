@@ -5,10 +5,11 @@ import DonacionForm from "@/components/DonacionForm";
 import StatusBadge from "@/components/StatusBadge";
 import Toast from "@/components/Toast";
 import EmptyState from "@/components/EmptyState";
-import { HandHeart } from "lucide-react";
+import { FileText, HandHeart } from "lucide-react";
 import { mensajes } from "@/lib/mensajes";
 import { confirmarRecepcionDonacion } from "@/lib/actions/donaciones";
 import PrimaryButton from "@/components/PrimaryButton";
+import OutlineButton from "@/components/OutlineButton";
 import GhostButton from "@/components/GhostButton";
 
 export const metadata = { title: "Donaciones" };
@@ -104,13 +105,18 @@ export default async function AdminDonacionesPage({ searchParams }) {
 
   return (
     <>
-      <header className="mb-6">
-        <h1 className="text-[28px] font-extrabold leading-[1.2] text-ink md:text-[34px]">
-          Donaciones
-        </h1>
-        <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
-          {donaciones.length} {donaciones.length === 1 ? "aporte registrado" : "aportes registrados"}
-        </p>
+      <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-[28px] font-extrabold leading-[1.2] text-ink md:text-[34px]">
+            Donaciones
+          </h1>
+          <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
+            {donaciones.length} {donaciones.length === 1 ? "aporte registrado" : "aportes registrados"}
+          </p>
+        </div>
+        <OutlineButton href="/admin/donaciones/informe" icono={FileText} tamano="sm">
+          Generar informe PDF
+        </OutlineButton>
       </header>
 
       <DashPanel className="mb-6">

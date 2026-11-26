@@ -16,7 +16,7 @@ export default function Sidebar({ sesion }) {
   const ruta = usePathname();
 
   return (
-    <aside className="flex flex-col gap-3 border-b border-[#eee5e8] bg-surface p-5 md:sticky md:top-0 md:h-screen md:overflow-y-auto md:self-start md:border-b-0 md:border-r md:py-6 md:px-5">
+    <aside className="flex flex-col gap-3 border-b border-[#eee5e8] bg-surface p-5 print:hidden md:sticky md:top-0 md:h-screen md:overflow-y-auto md:self-start md:border-b-0 md:border-r md:py-6 md:px-5">
       <Link href="/" className="flex items-center gap-3">
         <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-50">
           <PawPrint size={26} strokeWidth={2} aria-hidden="true" className="text-primary" />

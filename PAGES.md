@@ -139,10 +139,11 @@ dialoga. Si algo de diseño no está en `STYLEGUIDE.md`, se propone allí primer
 | 15 | `/admin/solicitudes`, `/admin/solicitudes/[id]` | Bandeja, revisión y decisión sobre solicitudes (US 4.3) | **Sprint 2 implementado** | **refugio2** |
 | 16 | `/admin/mascotas/[id]/editar` | Actualización de ficha de animal (US 1.3) | **Sprint 2 implementado** | **refugio2** |
 | 17 | `/admin/adoptantes/[id]/editar` | Actualización de información de adoptante (US 2.3) | **Sprint 2 implementado** | **refugio2** |
+| 18 | `/admin/donaciones/informe` | Informe en PDF de donaciones filtrable por tipo y período (US 3.1) | **Sprint 2 implementado** | **refugio2** |
 
 **Sprint 2 pendiente:** `/admin/dashboard`,
 borrado de fichas, `DonationModal`, `ConfirmDangerModal`, `AdoptanteDetailModal`, filtros
-avanzados, correos y PDF.
+avanzados, correos.
 
 ---
 
