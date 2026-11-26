@@ -146,6 +146,7 @@ export default async function AdminSolicitudDetallePage({ params, searchParams }
           <DecisionSolicitud
             solicitudId={solicitud.id}
             correoAdoptante={solicitud.adoptante.correo ?? null}
+            estadoActual={solicitud.estado}
           />
         </DashPanel>
       </div>

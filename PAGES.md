@@ -262,8 +262,9 @@ avanzados, correos.
        `descripcion_vivienda*` (textarea: condiciones de vivienda), `personas_en_hogar` (opcional).
      - Aceptación de términos*.
   5. Pie: `PrimaryButton` "Enviar solicitud" + `OutlineButton` "Cancelar".
-- **Interacciones:** al enviar → validación en servidor con errores por campo (borde `#b94f35` +
-  anillo `#f2e1d5` + mensaje bajo el campo; foco al primer inválido = ESC-4.1.1). Éxito → registro
+- **Interacciones:** al enviar → validación Zod **en cliente y en servidor** con errores por campo
+  (borde `#b94f35` + anillo `#f2e1d5` + mensaje bajo el campo; foco al primer inválido = ESC-4.1.1).
+  Éxito → registro
   y `Toast` "¡Solicitud enviada! Te contactaremos pronto." (`CircleCheck`) en la página de origen
   (ESC-4.1.2). Mascota ya no disponible → alerta para seleccionar otra.
 - **Datos y Backend:** Server Action `crearSolicitudAdopcion` con
@@ -282,9 +283,11 @@ avanzados, correos.
   "Panel del refugio", `FormField` `correo*`, `FormField` `contrasena*` (tipo password con toggle
   `Eye`/`EyeOff`), `PrimaryButton` "Ingresar" (full), `SecondaryButton` "Volver al sitio" → `/`,
   nota de modo demo.
-- **Interacciones:** validación de faltantes; credenciales inválidas → `ErrorBanner` "Correo o
-  contraseña incorrectos"; éxito → redirige a **`/admin/mascotas`** (el dashboard es Sprint 2).
-- **Datos y Backend:** `POST /api/auth/login` → verifica credenciales (usuarios de seed), devuelve
+- **Interacciones:** validación Zod en cliente y servidor con mensajes bajo cada campo (correo inválido
+  → "Escribe un correo válido como nombre@dominio.com"; contraseña vacía → "La contraseña es
+  obligatoria"); credenciales inválidas → `ErrorBanner` "Correo o contraseña incorrectos"; éxito →
+  redirige a **`/admin/mascotas`** (el dashboard es Sprint 2).
+- **Datos y Backend:** Server Action `iniciarSesion` → verifica credenciales (usuarios de seed), devuelve
   **JWT simple** firmado con `{ id, nombre, rol }` en cookie `httpOnly`. Middleware de Next.js protege
   `/admin/*`: sin token válido → redirect a `/login`.
 
@@ -423,7 +426,7 @@ avanzados, correos.
   5. Bloque **Info**: "Demo académica: sin pasarela de pago".
   6. Estados vacíos/carga/error + `Pagination`.
 - **Componentes e Interacciones:** cambiar el segmento alterna los grupos de campos (transición `.2s`);
-  `QuickAmounts` precarga el monto; **ESC-3.3.1** → si faltan campos se muestra el mensaje de alerta
+  `QuickAmounts` precarga el monto; validación Zod en cliente y servidor; **ESC-3.3.1** → si faltan campos se muestra el mensaje de alerta
   con **los campos faltantes** (rojo + foco al primero); **ESC-3.3.2** → `Toast` "Aporte registrado"
   + refresh de la tabla.
 - **Datos y Backend:** `GET /api/donaciones?tipo=&pagina=` y `POST /api/donaciones` con
@@ -442,6 +445,9 @@ avanzados, correos.
 - **Backend:** la Server Action comprueba la cédula, toma nombre y correo del registro existente y crea
   `donacion` vinculada con `adoptante_id` en estado `por_coordinar`; el equipo puede marcarla recibida
   desde el panel. Las donaciones registradas por staff siguen vinculadas a `usuario_id` y cuentan como recibidas.
+  "Marcar recibido" abre `ConfirmModal` (consecuencia explicada, botón deshabilitado con "Confirmando…"
+  mientras se guarda) y muestra el toast "Aporte marcado como recibido"; si ya estaba recibido, el error
+  se explica bajo el botón.
 
 ### 13. `/admin/solicitudes` — Revisión de solicitudes (Sprint 2)
 
@@ -456,7 +462,9 @@ avanzados, correos.
   La decisión se guarda en `solicitud_adopcion.estado`. Al **aprobar**, en la misma transacción la
   mascota pasa a `adoptado` (y desaparece del catálogo público) y se rechazan automáticamente las
   demás solicitudes `en_revision` de esa mascota; el toast lo comunica. Si la mascota ya tiene otra
-  solicitud aprobada, la aprobación se bloquea con un error accionable. Al revertir una aprobación,
+  solicitud aprobada, la aprobación se bloquea con un error accionable. Aprobar, rechazar **y volver
+   a en revisión** pasan por el mismo `ConfirmModal` accesible (trampa de foco) con la consecuencia
+   explicada. Al revertir una aprobación,
   la mascota vuelve a `en_adopcion` si no queda otra solicitud aprobada. US 2.5 añade el mensaje
   opcional al adoptante (correo simulado por `console.log`).
 
@@ -464,7 +472,7 @@ avanzados, correos.
 
 - **`Toast`:** único patrón de éxito/error global (inferior centrado, `#374151`, icono `CircleCheck`
   mint, 3500ms). Textos en español: "Ficha guardada con éxito", "Ficha actualizada con éxito", "Adoptante registrado", "Adoptante registrado con una solicitud en revisión", "Adoptante actualizado con éxito",
-  "Aporte registrado", "¡Gracias por tu aporte! El refugio coordinará contigo la entrega.",
+  "Aporte registrado", "Aporte marcado como recibido", "¡Gracias por tu aporte! El refugio coordinará contigo la entrega.",
   "¡Solicitud enviada! Te contactaremos pronto.", "Se rechazaron automáticamente las solicitudes
   pendientes de esta mascota.".
 - **Estados globales (de `STYLEGUIDE.md`):** `Spinner` (`Loader2`), `EmptyState` (icono + H3 Fraunces + CTA),

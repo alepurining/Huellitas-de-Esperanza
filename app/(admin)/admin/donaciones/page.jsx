@@ -9,9 +9,8 @@ import Toast from "@/components/Toast";
 import EmptyState from "@/components/EmptyState";
 import { FileText, HandHeart, SearchX } from "lucide-react";
 import { mensajes } from "@/lib/mensajes";
-import { confirmarRecepcionDonacion } from "@/lib/actions/donaciones";
 import { esquemaFiltroInformeDonaciones } from "@/lib/validaciones";
-import PrimaryButton from "@/components/PrimaryButton";
+import ConfirmarRecepcion from "@/components/ConfirmarRecepcion";
 import OutlineButton from "@/components/OutlineButton";
 import GhostButton from "@/components/GhostButton";
 import Chip from "@/components/Chip";
@@ -278,12 +277,10 @@ export default async function AdminDonacionesPage({ searchParams }) {
                     </td>
                     <td className="py-3">
                       {donacion.estado === "por_coordinar" ? (
-                        <form action={confirmarRecepcionDonacion}>
-                          <input type="hidden" name="id" value={donacion.id} />
-                          <PrimaryButton type="submit" tamano="sm">
-                            Marcar recibido
-                          </PrimaryButton>
-                        </form>
+                        <ConfirmarRecepcion
+                          donacionId={donacion.id}
+                          nombreDonante={donacion.nombre_donante}
+                        />
                       ) : (
                         <StatusBadge estado={donacion.estado} />
                       )}
@@ -296,6 +293,7 @@ export default async function AdminDonacionesPage({ searchParams }) {
         )}
       </DashPanel>
 
+      {typeof raw.recibida === "string" ? <Toast mensaje={mensajes.donacionRecibida} /> : null}
       {donacionNueva && !esPorAdoptante ? <Toast mensaje={mensajes.aporteRegistrado} /> : null}
     </>
   );

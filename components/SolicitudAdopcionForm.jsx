@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { CircleAlert } from "lucide-react";
 import { crearSolicitudAdopcion } from "@/lib/actions/solicitudes";
+import { esquemaSolicitud, erroresDe } from "@/lib/validaciones";
 import FormField from "@/components/FormField";
 import PrimaryButton from "@/components/PrimaryButton";
 import OutlineButton from "@/components/OutlineButton";
@@ -21,6 +22,23 @@ const etiquetasCampos = {
   acepta_terminos: "aceptación de términos",
 };
 
+function datosDelFormulario(formData) {
+  const personas = String(formData.get("personas_en_hogar") ?? "").trim();
+  return {
+    mascota_id: Number(formData.get("mascota_id")),
+    documento: String(formData.get("documento") ?? "").trim(),
+    nombre_completo: String(formData.get("nombre_completo") ?? "").trim(),
+    correo: String(formData.get("correo") ?? "").trim(),
+    telefono: String(formData.get("telefono") ?? "").trim(),
+    direccion: String(formData.get("direccion") ?? "").trim(),
+    tipo_vivienda: String(formData.get("tipo_vivienda") ?? ""),
+    personas_en_hogar: personas ? Number(personas) : undefined,
+    animales_en_hogar: formData.get("animales_en_hogar") === "on",
+    descripcion_vivienda: String(formData.get("descripcion_vivienda") ?? "").trim(),
+    acepta_terminos: formData.get("acepta_terminos") === "on",
+  };
+}
+
 export default function SolicitudAdopcionForm({
   mascotas,
   mascotaInicial,
@@ -29,22 +47,42 @@ export default function SolicitudAdopcionForm({
   origen = "ficha",
 }) {
   const [estado, accion, enviando] = useActionState(crearSolicitudAdopcion, null);
+  const [validacionCliente, setValidacionCliente] = useState(null);
   const formularioRef = useRef(null);
-  const camposFaltantes = estado?.camposFaltantes ?? [];
+  const estadoVisible = validacionCliente ?? estado;
+  const camposFaltantes = estadoVisible?.camposFaltantes ?? [];
 
   useEffect(() => {
     if (camposFaltantes.length) {
       formularioRef.current?.querySelector('[aria-invalid="true"]')?.focus();
     }
-  }, [camposFaltantes.length]);
+  }, [camposFaltantes.length, validacionCliente, estado]);
 
-  const errorDe = (campo) =>
-    estado?.errores?.[campo] ?? (camposFaltantes.includes(campo) ? "Revisa este dato" : undefined);
+  const errorDe = (campo) => estadoVisible?.errores?.[campo];
   // React 19 resetea el form al terminar la action; estos valores evitan perder lo escrito.
   const valorDe = (campo) => estado?.valores?.[campo] ?? "";
 
+  const manejarEnvio = (evento) => {
+    if (enviando) {
+      evento.preventDefault();
+      return;
+    }
+
+    const resultado = esquemaSolicitud.safeParse(datosDelFormulario(new FormData(evento.currentTarget)));
+    if (!resultado.success) {
+      evento.preventDefault();
+      setValidacionCliente({
+        ...erroresDe(resultado),
+        mensaje: "Revisa los campos marcados antes de enviar la solicitud.",
+      });
+      return;
+    }
+
+    setValidacionCliente(null);
+  };
+
   return (
-    <form ref={formularioRef} action={accion} noValidate className="mt-4">
+    <form ref={formularioRef} action={accion} onSubmit={manejarEnvio} noValidate className="mt-4">
       {mascotaInicial ? (
         <input type="hidden" name="mascota_id" value={mascotaInicial.id} />
       ) : (
@@ -70,7 +108,7 @@ export default function SolicitudAdopcionForm({
           className="mt-4 flex items-start gap-2 rounded-[12px] bg-danger-50 p-4 text-[13px] font-bold leading-[1.5] text-danger-700"
         >
           <CircleAlert size={18} strokeWidth={2} aria-hidden="true" className="mt-0.5 shrink-0" />
-          {estado.mensaje ??
+          {estadoVisible.mensaje ??
             `Revisa estos campos: ${camposFaltantes
               .map((campo) => etiquetasCampos[campo] ?? campo)
               .join(", ")}.`}

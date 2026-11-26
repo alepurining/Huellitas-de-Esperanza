@@ -1,24 +1,53 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { CircleAlert, Eye, EyeOff } from "lucide-react";
 import { iniciarSesion } from "@/lib/actions/auth";
+import { esquemaLogin, erroresDe } from "@/lib/validaciones";
 import FormField from "@/components/FormField";
 import PrimaryButton from "@/components/PrimaryButton";
 
 export default function LoginForm() {
   const [estado, accion, enviando] = useActionState(iniciarSesion, null);
+  const [validacionCliente, setValidacionCliente] = useState(null);
   const [verContrasena, setVerContrasena] = useState(false);
+  const formularioRef = useRef(null);
+  const estadoVisible = validacionCliente ?? estado;
 
-  const faltantes = estado?.camposFaltantes ?? [];
-  const errorDe = (campo) => (faltantes.includes(campo) ? "Revisa este dato" : undefined);
+  useEffect(() => {
+    if (estadoVisible?.camposFaltantes?.length) {
+      formularioRef.current?.querySelector('[aria-invalid="true"]')?.focus();
+    }
+  }, [estadoVisible]);
+
+  // ISO/IEC 25010 (User Assistance): el error dice qué campo falló y cómo corregirlo.
+  const errorDe = (campo) => estadoVisible?.errores?.[campo];
+
+  const manejarEnvio = (evento) => {
+    if (enviando) {
+      evento.preventDefault();
+      return;
+    }
+
+    const datos = new FormData(evento.currentTarget);
+    const resultado = esquemaLogin.safeParse({
+      correo: String(datos.get("correo") ?? "").trim().toLowerCase(),
+      contrasena: String(datos.get("contrasena") ?? ""),
+    });
+    if (!resultado.success) {
+      evento.preventDefault();
+      setValidacionCliente(erroresDe(resultado));
+      return;
+    }
+    setValidacionCliente(null);
+  };
 
   return (
-    <form action={accion} noValidate className="mt-6">
-      {estado?.error ? (
+    <form ref={formularioRef} action={accion} onSubmit={manejarEnvio} noValidate className="mt-6">
+      {estadoVisible?.error ? (
         <p className="mb-4 flex items-center gap-2 rounded-[12px] bg-danger-50 p-4 text-[13px] font-bold leading-[1.5] text-danger-700">
           <CircleAlert size={18} strokeWidth={2} aria-hidden="true" className="shrink-0" />
-          {estado.error}
+          {estadoVisible.error}
         </p>
       ) : null}
 

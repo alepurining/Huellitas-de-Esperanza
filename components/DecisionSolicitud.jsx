@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { Loader2, Send, AlertCircle } from "lucide-react";
 import { actualizarEstadoSolicitud } from "@/lib/actions/solicitudes";
+import ConfirmModal from "@/components/ConfirmModal";
 
 const ESTADOS = [
   { valor: "en_revision", etiqueta: "En revisión", clase: "border-border bg-warning-50 text-warning-700" },
@@ -12,30 +13,46 @@ const ESTADOS = [
 
 const CONSECUENCIAS = {
   aprobada:
-    "Aprobar esta solicitud marcará la mascota como adoptada y no podrá recibir nuevas solicitudes. Esta acción es definitiva.",
+    "Aprobar esta solicitud marcará la mascota como adoptada y rechazará automáticamente las otras solicitudes pendientes de esa mascota. Podrás revertir la decisión desde la bandeja.",
   rechazada:
     "Rechazar esta solicitud notificará al adoptante que su solicitud no fue aceptada. Podrá volver a postularse para otra mascota.",
 };
 
+// Volver a "en revisión" también cambia el estado de la mascota: se confirma igual que una decisión.
+const CONSECUENCIAS_REVERSION = {
+  aprobada:
+    "Volver a en revisión dejará la mascota disponible para nuevas solicitudes. Se notificará al adoptante si escribiste un mensaje.",
+  rechazada:
+    "Volver a en revisión permitiría aprobar esta solicitud más adelante. Se notificará al adoptante si escribiste un mensaje.",
+};
+
 const MAX_MENSAJE = 500;
 
-export default function DecisionSolicitud({ solicitudId, correoAdoptante }) {
-  const [estado, setEstado] = useState("en_revision");
+export default function DecisionSolicitud({ solicitudId, correoAdoptante, estadoActual = "en_revision" }) {
+  const [estado, setEstado] = useState(estadoActual);
   const [mensaje, setMensaje] = useState("");
   const [confirmando, setConfirmando] = useState(false);
+  const formularioRef = useRef(null);
 
   // useActionState para acceder al resultado del server action
   const [resultado, accion, pendiente] = useActionState(actualizarEstadoSolicitud, null);
 
-  const esCritico = estado === "aprobada" || estado === "rechazada";
+  const consecuencia =
+    estado === "en_revision" ? CONSECUENCIAS_REVERSION[estadoActual] : CONSECUENCIAS[estado];
+  const tituloConfirmacion =
+    estado === "en_revision"
+      ? "¿Volver a en revisión?"
+      : estado === "aprobada"
+      ? "¿Aprobar esta solicitud?"
+      : "¿Rechazar esta solicitud?";
   const sinCorreo = !correoAdoptante;
   const restanChars = MAX_MENSAJE - mensaje.length;
 
-  // Gate de confirmación: si la acción es crítica y aún no confirma, se abre el
-  // diálogo y se cancela el envío (React ejecuta la acción solo si no se hace
-  // preventDefault, y entonces sí actualiza `pendiente` para deshabilitar botones).
+  // Gate de confirmación: si el cambio afecta un estado importante y aún no se
+  // confirma, se abre el diálogo y se cancela el envío. El botón del modal vuelve
+  // a enviar el formulario con `confirmando` en true para que corra la action.
   function handleSubmit(e) {
-    if (esCritico && !confirmando) {
+    if (consecuencia && !confirmando) {
       e.preventDefault();
       setConfirmando(true);
       return;
@@ -45,7 +62,7 @@ export default function DecisionSolicitud({ solicitudId, correoAdoptante }) {
 
   return (
     <div>
-      <form action={accion} onSubmit={handleSubmit} className="mt-5 flex flex-col gap-5">
+      <form ref={formularioRef} action={accion} onSubmit={handleSubmit} className="mt-5 flex flex-col gap-5">
         <input type="hidden" name="id" value={solicitudId} />
 
         {/* Selector de decisión */}
@@ -113,58 +130,35 @@ export default function DecisionSolicitud({ solicitudId, correoAdoptante }) {
           </p>
         </div>
 
-        {/* Modal de confirmación para acciones críticas */}
-        {confirmando && esCritico && (
-          <div
-            role="alertdialog"
-            aria-labelledby="confirm-titulo"
-            aria-describedby="confirm-desc"
-            className="rounded-xl border border-border bg-warning-50 p-5"
+        <div>
+          <button
+            type="submit"
+            disabled={pendiente}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-6 py-3 text-sm font-extrabold text-white hover:bg-primary-700 disabled:opacity-60 transition-colors"
           >
-            <p id="confirm-titulo" className="font-extrabold text-warning-700">
-              ¿Confirmar acción?
-            </p>
-            <p id="confirm-desc" className="mt-1 text-sm text-warning-700">
-              {CONSECUENCIAS[estado]}
-            </p>
-            <div className="mt-4 flex gap-3">
-              <button
-                type="submit"
-                autoFocus
-                disabled={pendiente}
-                className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-extrabold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-[#f3f4f6] disabled:text-ink-300 disabled:opacity-70"
-              >
-                {pendiente ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : null}
-                {pendiente ? "Guardando…" : "Sí, confirmar"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setConfirmando(false)}
-                className="rounded-lg border border-border bg-white px-5 py-2.5 text-sm font-bold text-ink hover:bg-surface-alt"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
+            {pendiente ? (
+              <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+            ) : (
+              <Send size={16} aria-hidden="true" />
+            )}
+            {pendiente ? "Guardando…" : "Guardar decisión"}
+          </button>
+        </div>
 
-        {/* Botón principal (solo visible si no estamos en modo confirmación) */}
-        {!confirmando && (
-          <div>
-            <button
-              type="submit"
-              disabled={pendiente}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-6 py-3 text-sm font-extrabold text-white hover:bg-primary-700 disabled:opacity-60 transition-colors"
-            >
-              {pendiente ? (
-                <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-              ) : (
-                <Send size={16} aria-hidden="true" />
-              )}
-              {pendiente ? "Guardando…" : "Guardar decisión"}
-            </button>
-          </div>
-        )}
+        <ConfirmModal
+          abierto={confirmando && Boolean(consecuencia)}
+          kicker="Decisión de adopción"
+          titulo={tituloConfirmacion}
+          descripcion={consecuencia ?? ""}
+          textoConfirmar="Sí, confirmar"
+          enviando={pendiente}
+          alConfirmar={() => {
+            if (!pendiente) formularioRef.current?.requestSubmit();
+          }}
+          alCancelar={() => {
+            if (!pendiente) setConfirmando(false);
+          }}
+        />
 
         {/* Errores del server action */}
         {resultado?.error && (

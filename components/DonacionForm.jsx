@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { CircleAlert } from "lucide-react";
 import { registrarDonacion, registrarDonacionAdoptante, registrarDonacionPorAdoptante } from "@/lib/actions/donaciones";
+import { esquemaDonacion, esquemaDocumentoDonante, erroresDe } from "@/lib/validaciones";
 import FormField from "@/components/FormField";
 import MintButton from "@/components/MintButton";
 
@@ -44,19 +45,21 @@ export default function DonacionForm({ publico = false, buscarAdoptante = false 
     ? registrarDonacionPorAdoptante
     : registrarDonacion;
   const [estado, accion, enviando] = useActionState(accionRegistro, null);
+  const [validacionCliente, setValidacionCliente] = useState(null);
   const [tipo, setTipo] = useState("monetaria");
   const [monto, setMonto] = useState("");
   const formularioRef = useRef(null);
   const montoRef = useRef(null);
-  const camposFaltantes = estado?.camposFaltantes ?? [];
+  const estadoVisible = validacionCliente ?? estado;
+  const camposFaltantes = estadoVisible?.camposFaltantes ?? [];
 
   useEffect(() => {
     if (camposFaltantes.length) {
       formularioRef.current?.querySelector('[aria-invalid="true"]')?.focus();
     }
-  }, [camposFaltantes.length]);
+  }, [camposFaltantes.length, validacionCliente, estado]);
 
-  const errorDe = (campo) => estado?.errores?.[campo];
+  const errorDe = (campo) => estadoVisible?.errores?.[campo];
   // React 19 resetea el form al terminar la action; estos valores evitan perder lo escrito.
   const valorDe = (campo) => estado?.valores?.[campo] ?? "";
 
@@ -65,9 +68,47 @@ export default function DonacionForm({ publico = false, buscarAdoptante = false 
     montoRef.current?.focus();
   };
 
+  const manejarEnvio = (evento) => {
+    if (enviando) {
+      evento.preventDefault();
+      return;
+    }
+
+    const formData = new FormData(evento.currentTarget);
+    const datos = {
+      tipo_aporte: String(formData.get("tipo_aporte") ?? ""),
+      monto: String(formData.get("monto") ?? ""),
+      descripcion_insumo: String(formData.get("descripcion_insumo") ?? ""),
+      cantidad: String(formData.get("cantidad") ?? ""),
+      // En las variantes pública y "buscar adoptante" el nombre sale de la cédula.
+      nombre_donante:
+        publico || buscarAdoptante
+          ? "Adoptante registrado"
+          : String(formData.get("nombre_donante") ?? ""),
+      correo: String(formData.get("correo") ?? ""),
+    };
+    const resultados = [esquemaDonacion.safeParse(datos)];
+
+    if (publico || buscarAdoptante) {
+      resultados.push(esquemaDocumentoDonante.safeParse(String(formData.get("documento") ?? "")));
+    }
+
+    const fallidos = resultados.filter((resultado) => !resultado.success);
+    if (fallidos.length) {
+      evento.preventDefault();
+      setValidacionCliente({
+        ...erroresDe({ error: { issues: fallidos.flatMap((r) => r.error.issues) } }),
+        mensaje: "Revisa los campos marcados antes de registrar el aporte.",
+      });
+      return;
+    }
+
+    setValidacionCliente(null);
+  };
+
   return (
-    <form ref={formularioRef} action={accion} noValidate>
-      {estado?.camposFaltantes?.length ? (
+    <form ref={formularioRef} action={accion} onSubmit={manejarEnvio} noValidate>
+      {estadoVisible?.camposFaltantes?.length ? (
         <div
           role="alert"
           className="rounded-[12px] bg-danger-50 p-4 text-[13px] leading-[1.5] text-danger-700"
@@ -75,11 +116,11 @@ export default function DonacionForm({ publico = false, buscarAdoptante = false 
           <div className="flex items-start gap-2">
             <CircleAlert size={18} strokeWidth={2} aria-hidden="true" className="mt-0.5 shrink-0" />
             <p className="font-bold">
-              {estado.mensaje ?? "Revisa los campos antes de continuar:"}
+              {estadoVisible.mensaje ?? "Revisa los campos antes de continuar:"}
             </p>
           </div>
           <ul className="mt-1 list-disc pl-7 font-semibold">
-            {estado.camposFaltantes.map((campo) => (
+            {estadoVisible.camposFaltantes.map((campo) => (
               <li key={campo}>{etiquetasCampos[campo] ?? campo}</li>
             ))}
           </ul>
