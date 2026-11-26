@@ -138,6 +138,7 @@ dialoga. Si algo de diseño no está en `STYLEGUIDE.md`, se propone allí primer
 | 14 | `/donar` | Un adoptante registrado declara un aporte para coordinar su entrega | **Sprint 2 implementado** | **refugio2** |
 | 15 | `/admin/solicitudes`, `/admin/solicitudes/[id]` | Bandeja, revisión y decisión sobre solicitudes (US 4.3) | **Sprint 2 implementado** | **refugio2** |
 | 16 | `/admin/mascotas/[id]/editar` | Actualización de ficha de animal (US 1.3) | **Sprint 2 implementado** | **refugio2** |
+| 17 | `/admin/adoptantes/[id]/editar` | Actualización de información de adoptante (US 2.3) | **Sprint 2 implementado** | **refugio2** |
 
 **Sprint 2 pendiente:** `/admin/dashboard`,
 borrado de fichas, `DonationModal`, `ConfirmDangerModal`, `AdoptanteDetailModal`, filtros
@@ -427,7 +428,7 @@ avanzados, correos y PDF.
 ### 14. Transversales — `Toast` y estados
 
 - **`Toast`:** único patrón de éxito/error global (inferior centrado, `#374151`, icono `CircleCheck`
-  mint, 3500ms). Textos en español: "Ficha guardada con éxito", "Ficha actualizada con éxito", "Adoptante registrado",
+  mint, 3500ms). Textos en español: "Ficha guardada con éxito", "Ficha actualizada con éxito", "Adoptante registrado", "Adoptante actualizado con éxito",
   "Aporte registrado", "¡Gracias por tu aporte! El refugio coordinará contigo la entrega.",
   "¡Solicitud enviada! Te contactaremos pronto.".
 - **Estados globales (de `STYLEGUIDE.md`):** `Spinner` (`Loader2`), `EmptyState` (icono + H3 Fraunces + CTA),
@@ -462,7 +463,7 @@ avanzados, correos y PDF.
 | `/admin/dashboard` | Pantalla de apoyo sin historia Must; tras el login se va a `/admin/mascotas`. |
 | `/admin/solicitudes` (bandeja y cambio de estado) | Implementado: revisión del detalle y cambio de estado (US 4.3, Sprint 2). |
 | Edición y borrado de fichas (`ConfirmDangerModal`) | US 1.3 (Should) y permisos finos. |
-| Edición de adoptantes, `AdoptanteDetailModal` | US 2.3 (Should) y US 2.4 (Could). |
+| `AdoptanteDetailModal` | US 2.4 (Could). |
 | `DonationModal` | Con el formulario en panel de `/admin/donaciones` la US 3.3 ya se cumple. |
 | Filtros avanzados, historial de donaciones, PDF, comprobantes | US 1.4, 3.1, 3.4, 3.5 (Could/Should). |
 | Correos o mensajes al adoptante | US 2.5 (Should) y US 4.2 (Would). |

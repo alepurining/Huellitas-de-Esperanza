@@ -1,4 +1,5 @@
-import { SearchX, UserPlus } from "lucide-react";
+import Link from "next/link";
+import { Pencil, SearchX, UserPlus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import DashPanel from "@/components/DashPanel";
 import PanelHeading from "@/components/PanelHeading";
@@ -12,9 +13,10 @@ import { mensajes } from "@/lib/mensajes";
 export const metadata = { title: "Adoptantes" };
 
 export default async function AdminAdoptantesPage({ searchParams }) {
-  const { q, nuevo } = await searchParams;
+  const { q, nuevo, actualizado } = await searchParams;
   const busqueda = typeof q === "string" ? q.trim() : "";
   const idNuevo = typeof nuevo === "string" ? Number(nuevo) : 0;
+  const idActualizado = typeof actualizado === "string" ? Number(actualizado) : 0;
 
   const [adoptantes, total, adoptanteNuevo] = await Promise.all([
     prisma.adoptante.findMany({
@@ -125,6 +127,9 @@ export default async function AdminAdoptantesPage({ searchParams }) {
                   <th scope="col" className="hidden py-2 md:table-cell">
                     Estado
                   </th>
+                  <th scope="col" className="py-2 text-right">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -139,6 +144,16 @@ export default async function AdminAdoptantesPage({ searchParams }) {
                     <td className="hidden py-3 md:table-cell">
                       <StatusBadge estado={adoptante.estado} />
                     </td>
+                    <td className="py-3 text-right">
+                      <Link
+                        href={`/admin/adoptantes/${adoptante.id}/editar`}
+                        aria-label={`Editar a ${adoptante.nombre_completo}`}
+                        className="inline-flex h-10 items-center gap-1.5 rounded-pill px-3 text-[13px] font-extrabold text-[#b74581] transition duration-200 hover:bg-primary-50"
+                      >
+                        <Pencil size={15} strokeWidth={2} aria-hidden="true" />
+                        Editar
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -147,6 +162,9 @@ export default async function AdminAdoptantesPage({ searchParams }) {
         )}
       </DashPanel>
       {adoptanteNuevo ? <Toast mensaje={mensajes.adoptanteRegistrado} /> : null}
+      {Number.isSafeInteger(idActualizado) && idActualizado > 0 ? (
+        <Toast mensaje={mensajes.adoptanteActualizado} />
+      ) : null}
     </>
   );
 }
