@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation";
-import { ArrowLeft, PawPrint, Sparkles, Stethoscope } from "lucide-react";
+import { ArrowLeft, PawPrint, Pencil, Sparkles, Stethoscope } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { mensajes } from "@/lib/mensajes";
 import DashPanel from "@/components/DashPanel";
 import GhostButton from "@/components/GhostButton";
+import PrimaryButton from "@/components/PrimaryButton";
 import StatusBadge from "@/components/StatusBadge";
+import Toast from "@/components/Toast";
 
 export const metadata = { title: "Ficha de mascota" };
 
@@ -23,8 +26,8 @@ function Dato({ etiqueta, valor }) {
   );
 }
 
-export default async function FichaStaffPage({ params }) {
-  const { id } = await params;
+export default async function FichaStaffPage({ params, searchParams }) {
+  const [{ id }, { actualizada }] = await Promise.all([params, searchParams]);
 
   const numero = Number(id);
   if (!Number.isInteger(numero)) notFound();
@@ -38,11 +41,22 @@ export default async function FichaStaffPage({ params }) {
         Volver al listado
       </GhostButton>
 
-      <header className="mt-6 flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-[34px] leading-[1.1] text-ink md:text-[42px]">
-          {mascota.nombre}
-        </h1>
-        <StatusBadge estado={mascota.estado} className="translate-y-1.5" />
+      {actualizada === "1" ? <Toast mensaje={mensajes.fichaActualizada} /> : null}
+
+      <header className="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="font-display text-[34px] leading-[1.1] text-ink md:text-[42px]">
+            {mascota.nombre}
+          </h1>
+          <StatusBadge estado={mascota.estado} className="translate-y-1.5" />
+        </div>
+        <PrimaryButton
+          href={`/admin/mascotas/${mascota.id}/editar`}
+          icono={Pencil}
+          tamano="sm"
+        >
+          Editar ficha
+        </PrimaryButton>
       </header>
 
       <div className="mt-6 grid gap-6 md:grid-cols-[300px_1fr]">

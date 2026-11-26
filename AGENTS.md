@@ -7,6 +7,20 @@ existe. No intentar "correr" nada hasta que se cree el proyecto.
 
 **Equipo**: Andres Arroyo, Yudy Mayorga, Thomas Naranjo, Elian Blandon.
 
+## Requisitos No Funcionales (ISO/IEC 25010 — Usabilidad)
+
+Toda nueva funcionalidad, formulario o flujo interactivo debe cumplir obligatoriamente con estas dos subcaracterísticas:
+
+### 1. User Error Protection (Protección contra errores del usuario)
+- **Prevención de doble envío:** Todo botón de acción (`submit`, guardar, aprobar, rechazar, donar) debe deshabilitarse (`disabled`) y mostrar un estado de carga visual mientras la petición al servidor está en curso.
+- **Confirmación en acciones críticas o irreversibles:** Antes de ejecutar cambios de estado importantes (ej. aprobar/rechazar una solicitud de adopción o marcar un animal como adoptado), mostrar un modal o diálogo de confirmación explicando la consecuencia de la acción.
+- **Validación preventiva:** Validar tipos, formatos y rangos tanto en el cliente antes de enviar como en el servidor (ej. evitar montos negativos en donaciones, fechas futuras inválidas o correos mal formados).
+
+### 2. User Assistance (Asistencia al usuario)
+- **Mensajes de error accionables:** Nunca mostrar errores genéricos. Indicar exactamente qué campo falló y cómo corregirlo justo debajo del input correspondiente (ej. *"Ingresa un correo válido como nombre@dominio.com"*).
+- **Guía visual en formularios:** Marcar claramente los campos obligatorios (`*`), incluir `placeholders` con ejemplos del formato esperado y agregar textos de ayuda (`helper text`) en campos que puedan generar dudas.
+- **Feedback inmediato y estados vacíos:** Confirmar visualmente cada operación exitosa o fallida (notificación/alerta clara) y utilizar el componente `EmptyState` cuando una lista o filtro no tenga registros, orientando al usuario sobre qué hacer.
+
 **Qué hace la app (Sprint 1 — solo las 6 Must de Confluence)**:
 - **US 1.1 / 1.2** — Registro y consulta de animales en fichas digitales (listado y ficha detallada).
 - **US 2.1 / 2.2** — Registro y consulta de adoptantes (con búsqueda por cédula).
