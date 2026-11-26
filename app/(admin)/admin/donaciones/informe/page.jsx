@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { ArrowLeft, Coins, HandHeart, PackageOpen, SearchX } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getSesion } from "@/lib/auth";
@@ -64,6 +65,11 @@ function calcularRango(periodo, desde, hasta) {
 }
 
 export default async function InformeDonacionesPage({ searchParams }) {
+  const sesion = await getSesion();
+  if (sesion?.rol !== "administrador") {
+    redirect(sesion?.rol === "voluntario" ? "/admin/mascotas" : "/admin/donaciones");
+  }
+
   const raw = await searchParams;
   const entrada = {
     tipo: typeof raw.tipo === "string" ? raw.tipo : "todas",
@@ -84,26 +90,23 @@ export default async function InformeDonacionesPage({ searchParams }) {
 
   const rango = calcularRango(filtros.periodo, filtros.desde, filtros.hasta);
 
-  const [donaciones, sesion] = await Promise.all([
-    prisma.donacion.findMany({
-      where: {
-        ...(filtros.tipo !== "todas" ? { tipo_aporte: filtros.tipo } : {}),
-        ...(rango.gte || rango.lte
-          ? {
-              fecha_donacion: {
-                ...(rango.gte ? { gte: rango.gte } : {}),
-                ...(rango.lte ? { lte: rango.lte } : {}),
-              },
-            }
-          : {}),
-      },
-      include: {
-        adoptante: { select: { documento: true } },
-      },
-      orderBy: { fecha_donacion: "desc" },
-    }),
-    getSesion(),
-  ]);
+  const donaciones = await prisma.donacion.findMany({
+    where: {
+      ...(filtros.tipo !== "todas" ? { tipo_aporte: filtros.tipo } : {}),
+      ...(rango.gte || rango.lte
+        ? {
+            fecha_donacion: {
+              ...(rango.gte ? { gte: rango.gte } : {}),
+              ...(rango.lte ? { lte: rango.lte } : {}),
+            },
+          }
+        : {}),
+    },
+    include: {
+      adoptante: { select: { documento: true } },
+    },
+    orderBy: { fecha_donacion: "desc" },
+  });
 
   const totalMonetarioRecibido = donaciones
     .filter((d) => d.tipo_aporte === "monetaria" && d.estado === "recibida")

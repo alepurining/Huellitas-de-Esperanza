@@ -14,6 +14,9 @@ const items = [
 
 export default function Sidebar({ sesion }) {
   const ruta = usePathname();
+  const itemsVisibles = items.filter(
+    (item) => !(sesion?.rol === "voluntario" && item.href === "/admin/donaciones")
+  );
 
   return (
     <aside className="flex flex-col gap-3 border-b border-[#eee5e8] bg-surface p-5 print:hidden md:sticky md:top-0 md:h-screen md:overflow-y-auto md:self-start md:border-b-0 md:border-r md:py-6 md:px-5">
@@ -31,7 +34,7 @@ export default function Sidebar({ sesion }) {
 
       <nav aria-label="Panel del refugio">
         <ul className="flex gap-1 overflow-x-auto md:flex-col">
-          {items.map((item) => {
+          {itemsVisibles.map((item) => {
             const activo = ruta.startsWith(item.href);
             const Icono = item.icono;
             return (
