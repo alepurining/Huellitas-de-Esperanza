@@ -1,15 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, House, PawPrint, UserRound } from "lucide-react";
+import { ArrowLeft, House, PawPrint, UserRound, MessageCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { actualizarEstadoSolicitud } from "@/lib/actions/solicitudes";
 import { mensajes } from "@/lib/mensajes";
 import DashPanel from "@/components/DashPanel";
 import GhostButton from "@/components/GhostButton";
-import PrimaryButton from "@/components/PrimaryButton";
-import OutlineButton from "@/components/OutlineButton";
 import StatusBadge from "@/components/StatusBadge";
 import Toast from "@/components/Toast";
+import DecisionSolicitud from "@/components/DecisionSolicitud";
 
 export const metadata = { title: "Revisar solicitud" };
 
@@ -26,7 +24,7 @@ function Dato({ etiqueta, valor }) {
 }
 
 export default async function AdminSolicitudDetallePage({ params, searchParams }) {
-  const [{ id }, { actualizada }] = await Promise.all([params, searchParams]);
+  const [{ id }, sp] = await Promise.all([params, searchParams]);
   const numero = Number(id);
   if (!Number.isSafeInteger(numero) || numero < 1) notFound();
 
@@ -39,13 +37,20 @@ export default async function AdminSolicitudDetallePage({ params, searchParams }
   });
   if (!solicitud) notFound();
 
+  const toastMensaje =
+    sp.actualizada === "1"
+      ? sp.mensajeEnviado === "1"
+        ? mensajes.mensajeEnviadoAdoptante
+        : mensajes.solicitudActualizada
+      : null;
+
   return (
     <div className="mx-auto max-w-[980px]">
       <GhostButton href="/admin/solicitudes" icono={ArrowLeft}>
         Volver a solicitudes
       </GhostButton>
 
-      {actualizada === "1" ? <Toast mensaje={mensajes.solicitudActualizada} /> : null}
+      {toastMensaje ? <Toast mensaje={toastMensaje} /> : null}
 
       <header className="mt-6 flex flex-wrap items-center gap-3">
         <div>
@@ -120,32 +125,18 @@ export default async function AdminSolicitudDetallePage({ params, searchParams }
         </DashPanel>
 
         <DashPanel className="lg:col-span-2">
-          <h2 className="font-display text-2xl leading-[1.2] text-ink">Actualizar estado</h2>
+          <h2 className="flex items-center gap-2 font-display text-2xl leading-[1.2] text-ink">
+            <MessageCircle size={20} aria-hidden="true" />
+            Decisión y notificación
+          </h2>
           <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
-            Registra la decisión del equipo para esta solicitud.
+            Selecciona el nuevo estado de la solicitud y, si lo deseas, escribe un mensaje que recibirá{" "}
+            <strong>{solicitud.adoptante.nombre_completo}</strong> en su correo electrónico.
           </p>
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-            <form action={actualizarEstadoSolicitud}>
-              <input type="hidden" name="id" value={solicitud.id} />
-              <input type="hidden" name="estado" value="en_revision" />
-              <OutlineButton type="submit">En revisión</OutlineButton>
-            </form>
-            <form action={actualizarEstadoSolicitud}>
-              <input type="hidden" name="id" value={solicitud.id} />
-              <input type="hidden" name="estado" value="aprobada" />
-              <PrimaryButton type="submit">Aprobar</PrimaryButton>
-            </form>
-            <form action={actualizarEstadoSolicitud}>
-              <input type="hidden" name="id" value={solicitud.id} />
-              <input type="hidden" name="estado" value="rechazada" />
-              <OutlineButton
-                type="submit"
-                className="border-danger text-danger-700 hover:bg-danger-50"
-              >
-                Rechazar
-              </OutlineButton>
-            </form>
-          </div>
+          <DecisionSolicitud
+            solicitudId={solicitud.id}
+            correoAdoptante={solicitud.adoptante.correo ?? null}
+          />
         </DashPanel>
       </div>
     </div>

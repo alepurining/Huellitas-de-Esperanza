@@ -467,7 +467,7 @@ avanzados, correos.
 | `AdoptanteDetailModal` | US 2.4 (Could). |
 | `DonationModal` | Con el formulario en panel de `/admin/donaciones` la US 3.3 ya se cumple. |
 | Filtros avanzados, historial de donaciones, PDF, comprobantes | US 1.4, 3.1, 3.4, 3.5 (Could/Should). |
-| Correos o mensajes al adoptante | US 2.5 (Should) y US 4.2 (Would). |
+| Correos o mensajes al adoptante | US 2.5 (Should, **implementado** en Sprint 2: confirmación de decisión + mensaje con simulación de correo) y US 4.2 (Would). |
 | Historial clínico, informes de gasto, veterinarias socias, reportes, encuestas | US 1.5, 3.2, 4.2, 4.4, 4.5 (Would). |
 | Módulo de salud veterinaria y gestión de voluntariado | **No existen en Confluence**: no forman parte del proyecto. "Voluntariado" solo aparece como texto informativo en la landing. |
 
